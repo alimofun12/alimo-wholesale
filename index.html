@@ -165,6 +165,7 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
 /* ── TOAST ─────────────────────────────────────────────────── */
 #toast{display:none;position:fixed;bottom:18px;right:18px;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;color:#F5F0E8;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);}
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div id="root">
@@ -210,6 +211,22 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
       <label class="settings-label">Anthropic API Key</label>
       <input class="settings-input" id="anthropic-key-input" placeholder="sk-ant-..." type="password"/>
       <div class="settings-hint">Required to generate email drafts. Get yours at <strong>console.anthropic.com</strong> → API Keys. Stored only in your browser.</div>
+    </div>
+    <div class="settings-section">
+      <label class="settings-label">Gmail Integration</label>
+      <div id="gmail-status-line" style="font-size:12px;margin-bottom:8px;"></div>
+      <input class="settings-input" id="google-client-id-input" placeholder="123456789.apps.googleusercontent.com" style="margin-bottom:8px;"/>
+      <div class="settings-hint" style="margin-bottom:10px;">Google OAuth Client ID — needed for Save to Drafts and Sync Gmail. See setup instructions below.</div>
+      <button class="faire-try-btn" onclick="connectGmail()">Connect Gmail →</button>
+      <div class="settings-hint" style="margin-top:10px;padding:10px;background:#F0EDE8;border-radius:6px;line-height:1.7;">
+        <strong>One-time setup (5 min):</strong><br>
+        1. Go to <strong>console.cloud.google.com</strong><br>
+        2. New project → Enable <strong>Gmail API</strong><br>
+        3. OAuth consent screen → External → Add your email<br>
+        4. Credentials → OAuth 2.0 Client ID → Web app<br>
+        5. Add <strong>https://alimo-wholesale.vercel.app</strong> to Authorized JS origins<br>
+        6. Copy the Client ID and paste above
+      </div>
     </div>
     <div class="settings-actions">
       <button class="settings-cancel" onclick="closeSettings()">Close</button>
@@ -326,11 +343,11 @@ const TABS=[
 const N='#0D1B2A',KEY='alimo_v5';
 
 function loadSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync,faireToken,anthropicKey}));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync,faireToken,anthropicKey,googleClientId,gmailToken,gmailTokenExpiry}));}catch(e){}}
 
 const sv=loadSaved();
 let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate}:{...d};});
-let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'';
+let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'',googleClientId=sv?.googleClientId||'',gmailToken=sv?.gmailToken||'',gmailTokenExpiry=sv?.gmailTokenExpiry||0;
 let drafts=null,dIdx=0,body='',subj='',gen=false,send=false,err='',srchQ='';
 
 const byTab=t=>t==='contacted'?shops.filter(s=>s.status==='contacted'):shops.filter(s=>s.seg===t);
@@ -362,10 +379,12 @@ function openSettings(){
   document.getElementById('settings').style.display='flex';
   const ft=document.getElementById('faire-token-input');if(ft)ft.value=faireToken;
   const ak=document.getElementById('anthropic-key-input');if(ak)ak.value=anthropicKey;
+  const gc=document.getElementById('google-client-id-input');if(gc)gc.value=googleClientId;
   const fs=document.getElementById('faire-status');if(fs)fs.style.display='none';
+  updateGmailStatus();
 }
 function closeSettings(){document.getElementById('settings').style.display='none';}
-function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();anthropicKey=document.getElementById('anthropic-key-input').value.trim();save();closeSettings();toast('Settings saved!');}
+function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();anthropicKey=document.getElementById('anthropic-key-input').value.trim();googleClientId=document.getElementById('google-client-id-input').value.trim();save();closeSettings();toast('Settings saved!');}
 
 async function tryFaireSync(){
   const token=document.getElementById('faire-token-input').value.trim();
@@ -429,45 +448,116 @@ function importFaireCSV(){
   }catch(e){toast('CSV parse error: '+e.message,true);}
 }
 
+// ── GMAIL OAUTH ──────────────────────────────────────────────────────
+function gmailConnected(){return !!(gmailToken&&Date.now()<gmailTokenExpiry-60000);}
+
+function updateGmailStatus(){
+  const el=document.getElementById('gmail-status-line');
+  if(!el)return;
+  if(!googleClientId){el.innerHTML='<span style="color:#B24A2C;">⚠ Enter Google Client ID below, then connect.</span>';return;}
+  if(gmailConnected()){el.innerHTML='<span style="color:#1A7B4E;">✓ Gmail connected — hello@alimofun.com</span>';return;}
+  el.innerHTML='<span style="color:#C17E2A;">⚠ Not connected. Click Connect Gmail below.</span>';
+}
+
+function connectGmail(){
+  if(!googleClientId){toast('Enter your Google Client ID first',true);return;}
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:googleClientId,
+    scope:'https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/gmail.readonly',
+    callback:(resp)=>{
+      if(resp.error){toast('Gmail auth error: '+resp.error,true);return;}
+      gmailToken=resp.access_token;
+      gmailTokenExpiry=Date.now()+(resp.expires_in*1000);
+      save();updateGmailStatus();
+      toast('Gmail connected!');
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function ensureGmailToken(){
+  if(gmailConnected())return true;
+  if(!googleClientId){toast('Connect Gmail in ⚙ Settings first',true);return false;}
+  return new Promise(resolve=>{
+    const client=google.accounts.oauth2.initTokenClient({
+      client_id:googleClientId,
+      scope:'https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/gmail.readonly',
+      callback:(resp)=>{
+        if(resp.error){toast('Gmail auth needed — open ⚙ Settings',true);resolve(false);return;}
+        gmailToken=resp.access_token;
+        gmailTokenExpiry=Date.now()+(resp.expires_in*1000);
+        save();resolve(true);
+      }
+    });
+    client.requestAccessToken({prompt:''});
+  });
+}
+
+function makeEmailRaw(to,subject,body){
+  const from='hello@alimofun.com';
+  const msg=['From: Alimo Studios <'+from+'>','To: '+to,'Subject: '+subject,'MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','',''+body].join('\r\n');
+  return btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+async function saveGmail(){
+  const s=getSel();if(!s?.email||!body||send)return;
+  send=true;renderDetail();
+  const ok=await ensureGmailToken();
+  if(!ok){send=false;renderDetail();return;}
+  try{
+    const raw=makeEmailRaw(s.email,subj,body);
+    const res=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+gmailToken,'Content-Type':'application/json'},
+      body:JSON.stringify({message:{raw}})
+    });
+    if(!res.ok)throw new Error('Gmail API '+res.status);
+    markSent(s.id,body);toast('Saved to Gmail drafts!');
+  }catch(e){toast('Gmail error: '+e.message,true);}
+  finally{send=false;}
+}
+
 async function syncGmail(){
   const btn=document.getElementById('sync-btn');
   btn.disabled=true;btn.classList.add('syncing');btn.textContent='⟳ Syncing…';
+  const ok=await ensureGmailToken();
+  if(!ok){btn.disabled=false;btn.classList.remove('syncing');btn.textContent='⟳ Sync Gmail';return;}
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      model:'claude-sonnet-4-6',max_tokens:2000,
-      mcp_servers:[{type:'url',url:'https://gmail.mcp.claude.com/mcp',name:'gmail'}],
-      messages:[{role:'user',content:`Search Gmail sent folder for ALL emails from hello@alimofun.com. Use gmail_search_messages with query: "from:hello@alimofun.com is:sent" maxResults: 50. Return ONLY a JSON array: [{"to":"email","date":"Apr 13, 2026","body":"email body text"}]. Nothing else.`}]
-    })});
-    const data=await res.json();
-    const raw=data.content?.find(b=>b.type==='text')?.text||'';
-    const match=raw.match(/\[[\s\S]*\]/);
-    if(!match)throw new Error('No data returned');
-    const emails=JSON.parse(match[0]);
-    const sentMap={};
-    emails.forEach(e=>{
-      if(e.to&&e.date){
-        const a=e.to.toLowerCase().trim().replace(/.*<(.+)>/,'$1');
-        if(!sentMap[a]||new Date(e.date)>new Date(sentMap[a].date)){
-          sentMap[a]={date:e.date,body:e.body||''};
-        }
-      }
+    // Get sent message list
+    const q=encodeURIComponent('in:sent from:hello@alimofun.com');
+    const listRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?q='+q+'&maxResults=50',{
+      headers:{'Authorization':'Bearer '+gmailToken}
     });
+    if(!listRes.ok)throw new Error('Gmail list error '+listRes.status);
+    const listData=await listRes.json();
+    const msgs=listData.messages||[];
+    const sentMap={};
+    // Fetch each message to get To header and date
+    await Promise.all(msgs.map(async m=>{
+      try{
+        const mRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/'+m.id+'?format=metadata&metadataHeaders=To&metadataHeaders=Date',{
+          headers:{'Authorization':'Bearer '+gmailToken}
+        });
+        const mData=await mRes.json();
+        const headers=mData.payload?.headers||[];
+        const to=(headers.find(h=>h.name==='To')?.value||'').toLowerCase().replace(/.*<(.+)>/,'$1').trim();
+        const date=headers.find(h=>h.name==='Date')?.value||'';
+        if(to&&date&&!sentMap[to]){
+          const d=new Date(date);
+          sentMap[to]=d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
+        }
+      }catch(e){}
+    }));
     let updated=0;
     shops=shops.map(s=>{
       if(!s.email)return s;
       const a=s.email.toLowerCase().trim();
-      if(sentMap[a]){
-        if(s.status!=='contacted')updated++;
-        if(sentMap[a].body&&!learned.includes(sentMap[a].body)){
-          learned=[...learned,sentMap[a].body].filter((v,i,arr)=>arr.indexOf(v)===i).slice(-10);
-        }
-        return{...s,status:'contacted',sentDate:sentMap[a].date};
-      }
+      if(sentMap[a]){if(s.status!=='contacted')updated++;return{...s,status:'contacted',sentDate:sentMap[a]};}
       return s;
     });
     lastSync=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
     save();renderAll();
-    toast(updated>0?`Synced! ${updated} shop${updated>1?'s':''} newly marked as contacted.`:`Up to date. ${Object.keys(sentMap).length} sent emails found.`);
+    toast(updated>0?`Synced! ${updated} shops newly marked contacted.`:`Up to date. ${Object.keys(sentMap).length} sent emails found.`);
   }catch(e){toast('Sync error: '+e.message,true);}
   finally{btn.disabled=false;btn.classList.remove('syncing');btn.textContent='⟳ Sync Gmail';}
 }
@@ -494,15 +584,7 @@ async function generate(){
   finally{gen=false;renderDetail();}
 }
 
-async function saveGmail(){
-  const s=getSel();if(!s?.email||!body||send)return;
-  send=true;renderDetail();
-  try{
-    await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:300,messages:[{role:'user',content:'Create a Gmail draft. To: '+s.email+'. Subject: '+subj+'. Body:\n'+body+'\n\nUse gmail_create_draft tool.'}],mcp_servers:[{type:'url',url:'https://gmail.mcp.claude.com/mcp',name:'gmail'}]})});
-    markSent(s.id,body);toast('Saved to Gmail drafts!');
-  }catch(e){toast('Gmail error: '+e.message,true);}
-  finally{send=false;}
-}
+// saveGmail now defined above in Gmail OAuth section
 
 function renderAll(){
   renderHeader();
