@@ -329,6 +329,9 @@ const BASE_SHOPS=[
   {id:'c29',seg:'cold',name:'Surf Sister',city:'Tofino',state:'BC',country:'Canada',email:'office@surfsister.com',contact:'',web:'surfsister.com',status:'not_contacted',source:'Cold lead',b:['Iconic Tofino surf school and lifestyle shop since 1999','Curated apparel, prints, gifts for the surf community']},
   {id:'c30',seg:'cold',name:'Bons: Casa de Verano',city:'Chiba',state:'',country:'Japan',email:'',contact:'Yuko Shimajiri',web:'bons-ca.com',status:'not_contacted',source:'Cold lead',b:['Run by surfer Yuko Shimajiri, curates worldwide finds','Top Japanese surf shop per Seea surf magazine']},
 
+  // ── ERIK ABEL STOCKISTS ──────────────────────────────────────────────
+  {id:'ea1',seg:'cold',name:'ArtHouse & Co.',city:'Ventura',state:'CA',email:'',contact:'Jen Zahigian',web:'arthouseandcompany.com',status:'not_contacted',source:'Greenroom Artist Research',b:['Carries Erik Abel prints — Oregon artist, direct peer overlap with Alimo','Gallery + shop + community space in Downtown Ventura','Local artists, eco-friendly brands, curated coastal lifestyle']},
+
   // ── KRIS GOTO STOCKISTS ──────────────────────────────────────────────
   {id:'kg1',seg:'cold',name:'Honolulu Museum of Art Shop',city:'Honolulu',state:'HI',email:'',contact:'',web:'honolulumuseum.org',status:'not_contacted',source:'Greenroom Artist Research',b:['Carries Kris Goto, Punky Aloha, Lauren Trangmar prints','Premier cultural institution on Oahu','High foot traffic tourist and local clientele']},
   {id:'kg2',seg:'cold',name:'Roberta Oaks',city:'Honolulu',state:'HI',email:'',contact:'',web:'robertaoaks.com',status:'not_contacted',source:'Greenroom Artist Research',b:['Carries Kris Goto and Lauren Trangmar','Curated boutique in Downtown Honolulu','Local designers and indie artists focus']},
@@ -389,6 +392,20 @@ const BASE_SHOPS=[
 
 const PH={HI:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70',CA:'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=70',OR:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=70',NY:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=70',FL:'https://images.unsplash.com/photo-1515404929826-76fff9fef6fe?w=800&q=70',NC:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=800&q=70',MI:'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=70',IL:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=70',NJ:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=70',ME:'https://images.unsplash.com/photo-1473621038790-b778b4750efe?w=800&q=70',CO:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=70',WY:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=70',BC:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',France:'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=70',Japan:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=70',Spain:'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=70',Australia:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',Canada:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',def:'https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=70'};
 const gp=s=>{if(s.country&&PH[s.country])return PH[s.country];return PH[s.state]||PH.def;};
+
+const REGION=s=>{
+  if(s.country&&s.country!=='')return s.country==='Canada'?'Canada':s.country==='Japan'?'Japan':s.country==='France'?'France':s.country==='Spain'?'Spain':s.country==='Australia'?'Australia':'International';
+  const st=s.state||'';
+  if(st==='HI')return 'Hawaii';
+  if(['CA'].includes(st))return 'California';
+  if(['OR','WA'].includes(st))return 'Pacific Northwest';
+  if(['NY','NJ','CT','MA','ME','RI','NH','VT'].includes(st))return 'New York & New England';
+  if(['FL','SC','NC','GA','TN','VA'].includes(st))return 'Southeast';
+  if(['MI','IL','WI','MN','OH','IN','MO'].includes(st))return 'Midwest';
+  if(['CO','WY','UT','NM','AZ','ID','MT','NV'].includes(st))return 'Mountain & Desert';
+  return 'Other';
+};
+const REGION_ORDER=['Hawaii','California','Pacific Northwest','New York & New England','Southeast','Midwest','Mountain & Desert','Canada','Japan','France','Spain','Australia','International','Other'];
 
 const TABS=[
   {id:'cold',l:'New Leads',i:'✦'},
@@ -668,24 +685,54 @@ function renderTabs(){
 function renderList(){
   const F=filt();
   document.getElementById('srch').placeholder='Search '+F.length+' shops…';
-  document.getElementById('slist').innerHTML=F.map(s=>{
-    const on=s.id===selId;
-    const c=s.status==='contacted'||s.status==='active';
-    const hasEmail=!!s.email;
-    return`<div class="si${on?' on':''}" onclick="selShop('${s.id}')">
-      <div class="si-top">
-        ${c?`<span class="si-check">✓</span>`:''}
-        <span class="si-name">${s.name}</span>
-        ${hasEmail&&!c?`<span class="si-email-dot" title="Email on file"></span>`:''}
-        ${s.rev?`<span class="si-rev">$${Math.round(s.rev/1000*10)/10}K</span>`:''}
-      </div>
-      <div class="si-meta">
-        <span>${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}</span>
-        ${s.contact?`<span>· ${s.contact.split(' ')[0]}</span>`:''}
-        ${s.sentDate?`<span class="si-sent" style="${on?'':''}">sent ${s.sentDate}</span>`:''}
-      </div>
-    </div>`;
-  }).join('');
+  // Group by region if not searching
+  if(!srchQ){
+    const groups={};
+    F.forEach(s=>{const r=REGION(s);if(!groups[r])groups[r]=[];groups[r].push(s);});
+    let html='';
+    REGION_ORDER.forEach(r=>{
+      if(!groups[r])return;
+      html+=`<div style="padding:6px 10px 2px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9A8E82;border-top:1px solid #E5DDD0;margin-top:4px;">${r} <span style="font-weight:500;opacity:.6;">${groups[r].length}</span></div>`;
+      groups[r].forEach(s=>{
+        const on=s.id===selId;
+        const c=s.status==='contacted'||s.status==='active';
+        const hasEmail=!!s.email;
+        html+=`<div class="si${on?' on':''}" onclick="selShop('${s.id}')">
+          <div class="si-top">
+            ${c?`<span class="si-check">✓</span>`:''}
+            <span class="si-name">${s.name}</span>
+            ${hasEmail&&!c?`<span class="si-email-dot" title="Email on file"></span>`:''}
+            ${s.rev?`<span class="si-rev">$${Math.round(s.rev/1000*10)/10}K</span>`:''}
+          </div>
+          <div class="si-meta">
+            <span>${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}</span>
+            ${s.contact?`<span>· ${s.contact.split(' ')[0]}</span>`:''}
+            ${s.sentDate?`<span class="si-sent">sent ${s.sentDate}</span>`:''}
+          </div>
+        </div>`;
+      });
+    });
+    document.getElementById('slist').innerHTML=html;
+  } else {
+    document.getElementById('slist').innerHTML=F.map(s=>{
+      const on=s.id===selId;
+      const c=s.status==='contacted'||s.status==='active';
+      const hasEmail=!!s.email;
+      return`<div class="si${on?' on':''}" onclick="selShop('${s.id}')">
+        <div class="si-top">
+          ${c?`<span class="si-check">✓</span>`:''}
+          <span class="si-name">${s.name}</span>
+          ${hasEmail&&!c?`<span class="si-email-dot" title="Email on file"></span>`:''}
+          ${s.rev?`<span class="si-rev">$${Math.round(s.rev/1000*10)/10}K</span>`:''}
+        </div>
+        <div class="si-meta">
+          <span>${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}</span>
+          ${s.contact?`<span>· ${s.contact.split(' ')[0]}</span>`:''}
+          ${s.sentDate?`<span class="si-sent">sent ${s.sentDate}</span>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function renderDetail(){
