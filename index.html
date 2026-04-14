@@ -206,6 +206,11 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
       <textarea class="settings-input" id="faire-csv" rows="3" placeholder="Paste CSV data here…" style="margin-top:6px;resize:vertical;"></textarea>
       <button class="faire-try-btn" onclick="importFaireCSV()" style="margin-top:8px;">Import CSV</button>
     </div>
+    <div class="settings-section">
+      <label class="settings-label">Anthropic API Key</label>
+      <input class="settings-input" id="anthropic-key-input" placeholder="sk-ant-..." type="password"/>
+      <div class="settings-hint">Required to generate email drafts. Get yours at <strong>console.anthropic.com</strong> → API Keys. Stored only in your browser.</div>
+    </div>
     <div class="settings-actions">
       <button class="settings-cancel" onclick="closeSettings()">Close</button>
       <button class="settings-save" onclick="saveSettings()">Save Settings</button>
@@ -321,11 +326,11 @@ const TABS=[
 const N='#0D1B2A',KEY='alimo_v5';
 
 function loadSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync,faireToken}));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync,faireToken,anthropicKey}));}catch(e){}}
 
 const sv=loadSaved();
 let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate}:{...d};});
-let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'';
+let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'';
 let drafts=null,dIdx=0,body='',subj='',gen=false,send=false,err='',srchQ='';
 
 const byTab=t=>t==='contacted'?shops.filter(s=>s.status==='contacted'):shops.filter(s=>s.seg===t);
@@ -355,11 +360,12 @@ function openModal(id,name){
 
 function openSettings(){
   document.getElementById('faire-token-input').value=faireToken;
+  document.getElementById('anthropic-key-input').value=anthropicKey;
   document.getElementById('settings').style.display='flex';
   document.getElementById('faire-status').style.display='none';
 }
 function closeSettings(){document.getElementById('settings').style.display='none';}
-function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();save();closeSettings();toast('Settings saved!');}
+function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();anthropicKey=document.getElementById('anthropic-key-input').value.trim();save();closeSettings();toast('Settings saved!');}
 
 async function tryFaireSync(){
   const token=document.getElementById('faire-token-input').value.trim();
@@ -475,7 +481,8 @@ async function generate(){
     const hist=s.rev?'Faire history: $'+s.rev.toLocaleString()+' total, '+s.orders+' orders, last: '+s.last+' ('+s.days+' days ago). Reference this warmly.':'New prospect, never ordered from Alimo.';
     const sys=`You write wholesale emails for Alimo (Sean Kesterson), artist from Oregon based in Brooklyn. Makes bold colorful ocean/surf prints, puzzles, air fresheners, stickers. Stocked at Greenroom Gallery Hawaii. Commercial work: Patagonia, Swatch, Portland Trail Blazers.\n\nRULES: Short punchy sentences. Fragments totally OK. Casual warm genuine. NEVER use em dashes. No hyphens joining phrases. Short paragraphs. Humble ask. Reference something specific about this shop. Always include https://alimofun.faire.com, 50% off first order up to $150 1 year free shipping, Greenroom Gallery Hawaii.\n\nSIGN OFF exactly:\nCheers!\n\nThanks,\nAlimo\nalimofun.com\n@alimofun\n\nSUBJECT: Personal and specific to THIS shop. Short, human, a bit fun. Two completely different ones for A and B.${ln}`;
     const usr=`Two different wholesale outreach emails from Alimo to this specific shop. Make each feel genuinely personal. SHORT, 4 paragraphs max.\n\nShop: ${s.name}\nLocation: ${s.city}${s.state?', '+s.state:''}${s.country?', '+s.country:''}\n${s.contact?'Contact: '+s.contact+'\n':''}${s.web?'Website: '+s.web+'\n':''}${buls}\n${hist}\n\nReturn EXACTLY:\nSUBJECT_A\n[subject]\nDRAFT_A\n[email]\nSUBJECT_B\n[subject]\nDRAFT_B\n[email]`;
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1400,system:sys,messages:[{role:'user',content:usr}]})});
+    if(!anthropicKey){throw new Error('Add your Anthropic API key in ⚙ Settings to generate drafts.');}
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1400,system:sys,messages:[{role:'user',content:usr}]})});
     if(!r.ok)throw new Error('API '+r.status);
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     const raw=d.content?.find(b=>b.type==='text')?.text||'';
