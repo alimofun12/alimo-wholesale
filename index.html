@@ -460,6 +460,9 @@ function updateGmailStatus(){
 }
 
 function connectGmail(){
+  // Read live from input OR fall back to saved value
+  const inputEl=document.getElementById('google-client-id-input');
+  if(inputEl&&inputEl.value.trim())googleClientId=inputEl.value.trim();
   if(!googleClientId){toast('Enter your Google Client ID first',true);return;}
   const client=google.accounts.oauth2.initTokenClient({
     client_id:googleClientId,
