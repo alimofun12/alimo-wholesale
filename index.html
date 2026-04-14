@@ -164,10 +164,31 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
 
 /* ── TOAST ─────────────────────────────────────────────────── */
 #toast{display:none;position:fixed;bottom:18px;right:18px;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;color:#F5F0E8;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+
+/* ── PASSWORD GATE ───────────────────────────────────────────── */
+#gate{position:fixed;inset:0;background:#0D1B2A;z-index:9999;display:flex;align-items:center;justify-content:center;}
+.gate-box{text-align:center;width:320px;}
+.gate-logo{font-size:32px;font-weight:900;color:#F5F0E8;letter-spacing:.08em;margin-bottom:6px;}
+.gate-sub{font-size:12px;color:#4A6A7A;text-transform:uppercase;letter-spacing:.2em;margin-bottom:40px;}
+.gate-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 18px;font-size:15px;color:#F5F0E8;outline:none;text-align:center;letter-spacing:.1em;margin-bottom:12px;}
+.gate-input::placeholder{color:rgba(255,255,255,.2);letter-spacing:.05em;}
+.gate-input:focus{border-color:rgba(91,168,158,.6);background:rgba(255,255,255,.1);}
+.gate-btn{width:100%;background:#5BA89E;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;color:white;letter-spacing:.05em;cursor:pointer;transition:background .15s;}
+.gate-btn:hover{background:#4A9A90;}
+.gate-err{font-size:12px;color:#E07A50;margin-top:10px;height:16px;}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">ALIMO</div>
+    <div class="gate-sub">Wholesale Dashboard</div>
+    <input class="gate-input" id="gate-pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkGate()"/>
+    <button class="gate-btn" onclick="checkGate()">Enter</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
 <div id="root">
   <div id="hdr">
     <span class="logo">ALIMO</span><span style="font-size:8px;color:#3A5A6A;margin-left:4px;font-weight:600;">v1.3</span>
@@ -745,6 +766,34 @@ function selTab(t){
   const si=document.getElementById('srch');if(si)si.value='';
   renderAll();
 }
+
+// ── PASSWORD GATE ────────────────────────────────────────────────
+const GATE_KEY='alimo_auth';
+const GATE_PW='alimofun'; // change this to whatever you want
+
+function checkGate(){
+  const val=document.getElementById('gate-pw').value;
+  if(val===GATE_PW){
+    localStorage.setItem(GATE_KEY,Date.now()+30*24*60*60*1000);
+    document.getElementById('gate').style.display='none';
+    document.getElementById('gate-pw').value='';
+  } else {
+    document.getElementById('gate-err').textContent='Wrong password';
+    document.getElementById('gate-pw').value='';
+    document.getElementById('gate-pw').focus();
+    setTimeout(()=>document.getElementById('gate-err').textContent='',2000);
+  }
+}
+
+function initGate(){
+  const expiry=parseInt(localStorage.getItem(GATE_KEY)||'0');
+  if(Date.now()<expiry){
+    document.getElementById('gate').style.display='none';
+  } else {
+    setTimeout(()=>document.getElementById('gate-pw').focus(),100);
+  }
+}
+initGate();
 
 renderAll();
 </script>
