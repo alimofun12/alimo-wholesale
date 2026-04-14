@@ -2,143 +2,256 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Alimo Wholesale Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:sans-serif;background:#F5F0E8;color:#1A1A1A;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:#C4B49A;border-radius:4px;}
-button,input,textarea{font-family:inherit;}button{cursor:pointer;}
-#hdr{background:#0D1B2A;height:48px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
-.logo{font-size:18px;font-weight:900;color:#F5F0E8;letter-spacing:.06em;}
-.hdiv{width:1px;height:18px;background:rgba(255,255,255,.15);}
-.hsub{font-size:8px;color:#7A94A8;text-transform:uppercase;letter-spacing:.15em;font-weight:700;flex:1;}
-.sync-btn{background:rgba(91,168,158,.15);border:1px solid rgba(91,168,158,.4);border-radius:6px;padding:5px 10px;font-size:9px;font-weight:700;color:#5BA89E;white-space:nowrap;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F0E8;color:#1A1A1A;overflow:hidden;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:#C9B99A;border-radius:4px;}
+button,input,textarea,select{font-family:inherit;cursor:pointer;}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+#root{display:grid;grid-template-rows:56px 1fr;height:100vh;}
+#hdr{background:#0D1B2A;display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;}
+#body{display:grid;grid-template-columns:280px 1fr;overflow:hidden;}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.logo{font-size:20px;font-weight:900;color:#F5F0E8;letter-spacing:.06em;flex-shrink:0;}
+.hd{width:1px;height:20px;background:rgba(255,255,255,.15);}
+.hsub{font-size:9px;color:#7A94A8;text-transform:uppercase;letter-spacing:.15em;font-weight:700;flex:1;}
+.htab{text-align:center;cursor:pointer;padding:0 8px;opacity:.4;transition:opacity .15s;border:none;background:transparent;}
+.htab.on{opacity:1;}
+.htab-n{font-size:16px;font-weight:900;color:#F5F0E8;line-height:1;}
+.htab-l{font-size:8px;color:#7A94A8;text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+.hbtn{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;border:none;cursor:pointer;}
+.sync-btn{background:rgba(91,168,158,.18);border:1px solid rgba(91,168,158,.45);color:#5BA89E;}
 .sync-btn:disabled{opacity:.5;}
 .sync-btn.syncing{animation:pulse 1s infinite;}
+.settings-btn{background:rgba(255,255,255,.1);color:#AAB8C2;margin-left:4px;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.tc{text-align:center;cursor:pointer;padding:0 5px;opacity:.4;user-select:none;}
-.tc.on{opacity:1;}.tcn{font-size:13px;font-weight:900;color:#F5F0E8;}.tcl{font-size:7px;color:#7A94A8;text-transform:uppercase;}
-#body{display:flex;flex:1;overflow:hidden;}
-#side{width:230px;flex-shrink:0;background:#FDFAF5;border-right:1px solid #E5DDD0;display:flex;flex-direction:column;overflow:hidden;}
-.stabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #E5DDD0;flex-shrink:0;}
-.stab{background:transparent;border:none;padding:8px 3px;font-size:7px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9A8E82;display:flex;flex-direction:column;align-items:center;gap:1px;}
-.stab.on{background:#0D1B2A;color:#F5F0E8;}.stabn{font-size:12px;font-weight:700;}
-.ssch{padding:6px 8px;border-bottom:1px solid #E5DDD0;flex-shrink:0;}
-.ssch input{width:100%;background:#EDE9E0;border:1px solid #E5DDD0;border-radius:5px;padding:5px 8px;font-size:10px;outline:none;}
-.slist{flex:1;overflow-y:auto;padding:3px;}
-.si{padding:7px 8px;border-radius:5px;margin-bottom:1px;cursor:pointer;border:1px solid transparent;user-select:none;}
-.si.on{background:#0D1B2A;}.si:not(.on):hover{background:rgba(0,0,0,.04);}
-.sin{font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1A1A1A;}
-.si.on .sin{color:#F5F0E8;}.sim{font-size:8px;color:#9A8E82;display:flex;gap:3px;margin-top:1px;}.si.on .sim{color:#7A94A8;}
-#det{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.ph{height:155px;flex-shrink:0;position:relative;overflow:hidden;background:#0D1B2A;}
-.ph img{width:100%;height:100%;object-fit:cover;opacity:.5;}
-.ov{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(13,27,42,.95));}
-.shn{font-size:19px;font-weight:700;color:#F5F0E8;line-height:1.1;}.shm{font-size:9px;color:rgba(245,240,232,.5);margin-top:2px;}
-.bdg{font-size:7px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;color:white;}
-.mkb{background:rgba(245,240,232,.12);border:1px solid rgba(245,240,232,.25);border-radius:4px;padding:4px 9px;font-size:8px;font-weight:700;color:rgba(245,240,232,.8);text-transform:uppercase;}
-.scr{flex:1;overflow-y:auto;padding:10px 13px;display:flex;flex-direction:column;gap:9px;}
-.chips{display:flex;gap:5px;flex-wrap:wrap;}
-.chip{background:#EDE9E0;border:1px solid #E5DDD0;border-radius:6px;padding:5px 9px;}
-.chl{font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:#9A8E82;font-weight:700;margin-bottom:1px;}.chv{font-size:9px;font-weight:700;}
-.buls{background:#FDFAF5;border:1px solid #E5DDD0;border-radius:8px;padding:9px 11px;}
-.bulh{font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:#9A8E82;font-weight:700;margin-bottom:5px;}
-.comp{background:#FDFAF5;border:1px solid #E5DDD0;border-radius:10px;overflow:hidden;}
-.comph{padding:8px 12px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;justify-content:space-between;gap:6px;}
-.compt{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0D1B2A;}
-.gb{background:#0D1B2A;border:none;border-radius:6px;padding:7px 12px;font-size:9px;font-weight:700;color:#F5F0E8;}
-.gb:disabled{opacity:.5;}.dtog{display:flex;gap:1px;background:#EDE9E0;border-radius:4px;padding:1px;}
-.db{padding:2px 8px;border:none;border-radius:3px;font-size:9px;font-weight:700;background:transparent;color:#9A8E82;}
-.db.on{background:#0D1B2A;color:#F5F0E8;}
-.cbdy{padding:9px 11px;display:flex;flex-direction:column;gap:6px;}
-.cbdy input{background:#EDE9E0;border:1px solid #E5DDD0;border-radius:5px;padding:6px 9px;font-size:10px;font-weight:700;color:#0D1B2A;outline:none;width:100%;}
-.cbdy textarea{background:#EDE9E0;border:1px solid #E5DDD0;border-radius:5px;padding:9px;font-size:10px;color:#1A1A1A;outline:none;resize:vertical;line-height:1.7;width:100%;}
-.cft{padding:8px 11px;border-top:1px solid #E5DDD0;display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
-.svb{background:#2A8A8A;border:none;border-radius:6px;padding:7px 12px;font-size:10px;font-weight:700;color:white;}
-.svb:disabled{opacity:.5;}.mrb{background:transparent;border:1px solid #E5DDD0;border-radius:6px;padding:7px 9px;font-size:9px;font-weight:700;color:#3D3530;}
-.noe{font-size:9px;color:#B24A2C;background:rgba(178,74,44,.08);padding:4px 8px;border-radius:4px;border:1px solid rgba(178,74,44,.2);}
-.emp{padding:22px;text-align:center;color:#9A8E82;}
-.gerr{padding:8px 12px;background:#FFF0EB;border-bottom:1px solid #F5C9B8;font-size:9px;color:#8B2500;}
-#toast{display:none;position:fixed;bottom:14px;right:14px;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:#F5F0E8;z-index:999;}
+.lrn-badge{font-size:9px;color:#5BA89E;background:rgba(91,168,158,.12);padding:3px 9px;border-radius:8px;border:1px solid rgba(91,168,158,.3);white-space:nowrap;}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+#side{background:#FDFAF5;border-right:1px solid #E5DDD0;display:flex;flex-direction:column;overflow:hidden;}
+.stabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #E5DDD0;flex-shrink:0;}
+.stab{background:transparent;border:none;padding:10px 4px;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9A8E82;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stab.on{background:#0D1B2A;color:#F5F0E8;}
+.stab-n{font-size:14px;font-weight:900;}
+.srch{padding:8px 10px;border-bottom:1px solid #E5DDD0;flex-shrink:0;}
+.srch input{width:100%;background:#EDE9E0;border:1px solid #E5DDD0;border-radius:7px;padding:7px 11px;font-size:13px;outline:none;color:#1A1A1A;}
+.srch input::placeholder{color:#AAA;}
+#slist{flex:1;overflow-y:auto;padding:4px;}
+
+/* ── SHOP LIST ITEM ─────────────────────────────────────────── */
+.si{padding:10px 11px;border-radius:7px;margin-bottom:2px;cursor:pointer;border:1px solid transparent;transition:background .1s;}
+.si.on{background:#0D1B2A;}
+.si:not(.on):hover{background:rgba(0,0,0,.04);}
+.si-top{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.si-name{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;color:#1A1A1A;}
+.si.on .si-name{color:#F5F0E8;}
+.si-rev{font-size:11px;font-weight:700;color:#C17E2A;flex-shrink:0;}
+.si.on .si-rev{color:#E07A50;}
+.si-email-dot{width:6px;height:6px;border-radius:50%;background:#2A8A8A;flex-shrink:0;}
+.si.on .si-email-dot{background:#5BA89E;}
+.si-meta{font-size:11px;color:#9A8E82;display:flex;gap:4px;align-items:center;}
+.si.on .si-meta{color:#7A94A8;}
+.si-check{font-size:10px;font-weight:700;color:#1A7B4E;flex-shrink:0;}
+.si.on .si-check{color:#5BA89E;}
+.si-sent{font-size:10px;font-weight:600;color:#1A7B4E;margin-left:auto;}
+.si.on .si-sent{color:#5BA89E;}
+
+/* ── DETAIL PANEL ───────────────────────────────────────────── */
+#det{display:flex;flex-direction:column;overflow:hidden;background:#F9F5F0;}
+.ph{height:180px;flex-shrink:0;position:relative;overflow:hidden;background:#0D1B2A;}
+.ph img{width:100%;height:100%;object-fit:cover;opacity:.55;}
+.ph-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(13,27,42,.97) 0%,rgba(13,27,42,.2) 60%,transparent 100%);}
+.ph-content{position:absolute;bottom:0;left:0;right:0;padding:14px 18px 12px;}
+.ph-name{font-size:22px;font-weight:700;color:#F5F0E8;line-height:1.15;margin-bottom:4px;}
+.ph-meta{font-size:12px;color:rgba(245,240,232,.6);display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.ph-meta a{color:rgba(91,168,158,.9);text-decoration:none;}
+.ph-actions{display:flex;gap:7px;align-items:center;}
+.bdg{font-size:10px;font-weight:700;padding:4px 11px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;color:white;}
+.mkb{background:rgba(245,240,232,.14);border:1px solid rgba(245,240,232,.28);border-radius:5px;padding:5px 11px;font-size:10px;font-weight:700;color:rgba(245,240,232,.85);text-transform:uppercase;}
+
+/* ── SCROLL CONTENT ─────────────────────────────────────────── */
+#scr{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px;}
+
+/* ── CHIPS ─────────────────────────────────────────────────── */
+.chips{display:flex;gap:7px;flex-wrap:wrap;}
+.chip{background:white;border:1px solid #E5DDD0;border-radius:8px;padding:6px 12px;}
+.chip-l{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#9A8E82;font-weight:700;margin-bottom:2px;}
+.chip-v{font-size:13px;font-weight:700;color:#1A1A1A;}
+.chip.green{background:rgba(26,123,78,.07);border-color:rgba(26,123,78,.2);}.chip.green .chip-v{color:#1A7B4E;}
+.chip.orange{background:rgba(224,122,80,.07);border-color:rgba(224,122,80,.2);}.chip.orange .chip-v{color:#C17E2A;}
+.chip.red{background:rgba(178,74,44,.07);border-color:rgba(178,74,44,.2);}.chip.red .chip-v{color:#B24A2C;}
+
+/* ── ABOUT CARD ─────────────────────────────────────────────── */
+.about-card{background:white;border:1px solid #E5DDD0;border-radius:10px;padding:12px 14px;}
+.about-h{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#9A8E82;font-weight:700;margin-bottom:8px;}
+.about-item{display:flex;gap:8px;font-size:13px;color:#3D3530;line-height:1.5;margin-bottom:5px;}
+.about-item:last-child{margin-bottom:0;}
+.about-arr{color:#E07A50;flex-shrink:0;font-size:12px;margin-top:1px;}
+
+/* ── EMAIL COMPOSER ─────────────────────────────────────────── */
+.composer{background:white;border:1px solid #E5DDD0;border-radius:10px;overflow:hidden;}
+.comp-hdr{padding:11px 14px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.comp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#0D1B2A;}
+.comp-btns{display:flex;gap:6px;align-items:center;}
+.dtog{display:flex;gap:1px;background:#EDE9E0;border-radius:5px;padding:1px;}
+.dtog-btn{padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:700;background:transparent;color:#9A8E82;}
+.dtog-btn.on{background:#0D1B2A;color:#F5F0E8;}
+.gen-btn{background:#0D1B2A;border:none;border-radius:7px;padding:8px 14px;font-size:11px;font-weight:700;color:#F5F0E8;}
+.gen-btn:disabled{opacity:.5;}
+.comp-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+.comp-body input,.comp-body textarea{background:#F7F3EE;border:1px solid #E5DDD0;border-radius:7px;outline:none;width:100%;font-size:13px;color:#1A1A1A;}
+.comp-body input{padding:8px 11px;font-weight:600;}
+.comp-body textarea{padding:11px;line-height:1.75;resize:vertical;}
+.comp-footer{padding:10px 14px;border-top:1px solid #E5DDD0;display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.save-btn{background:#2A8A8A;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;color:white;}
+.save-btn:disabled{opacity:.5;}
+.mark-btn{background:transparent;border:1px solid #E5DDD0;border-radius:7px;padding:8px 11px;font-size:11px;font-weight:700;color:#3D3530;}
+.no-email{font-size:11px;color:#B24A2C;background:rgba(178,74,44,.07);padding:5px 10px;border-radius:5px;border:1px solid rgba(178,74,44,.2);}
+.learned-note{margin-left:auto;font-size:11px;color:#9A8E82;font-style:italic;}
+.comp-empty{padding:28px;text-align:center;color:#9A8E82;}
+.comp-empty-icon{font-size:36px;color:#D4C5A9;margin-bottom:10px;}
+.comp-empty-txt{font-size:13px;line-height:1.6;}
+.comp-err{padding:10px 14px;background:#FFF0EB;border-bottom:1px solid #F5C9B8;font-size:12px;color:#8B2500;}
+
+/* ── CONTACTED VIEW ─────────────────────────────────────────── */
+.contacted-wrap{overflow-y:auto;padding:20px 18px;height:100%;}
+.contacted-header{margin-bottom:16px;}
+.contacted-title{font-size:22px;font-weight:700;color:#0D1B2A;margin-bottom:4px;}
+.contacted-sub{font-size:13px;color:#7A6E63;}
+.contacted-list{display:flex;flex-direction:column;gap:8px;}
+.c-card{background:white;border:1px solid #E5DDD0;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.c-check{width:36px;height:36px;background:rgba(26,123,78,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.c-info{flex:1;}
+.c-name{font-size:15px;font-weight:700;color:#0D1B2A;margin-bottom:2px;}
+.c-meta{font-size:12px;color:#7A6E63;}
+.c-date{font-size:12px;font-weight:600;color:#1A7B4E;background:rgba(26,123,78,.08);padding:4px 10px;border-radius:6px;flex-shrink:0;}
+.empty-state{padding:40px 20px;text-align:center;color:#9A8E82;}
+.empty-icon{font-size:40px;color:#D4C5A9;margin-bottom:12px;}
+.empty-txt{font-size:14px;line-height:1.6;}
+
+/* ── SETTINGS PANEL ─────────────────────────────────────────── */
+#settings{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;}
+.settings-box{background:#FDFAF5;border-radius:14px;padding:28px;width:480px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,.25);}
+.settings-title{font-size:18px;font-weight:700;color:#0D1B2A;margin-bottom:6px;}
+.settings-sub{font-size:13px;color:#7A6E63;margin-bottom:22px;line-height:1.5;}
+.settings-section{margin-bottom:20px;}
+.settings-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7A6E63;margin-bottom:6px;}
+.settings-input{width:100%;background:white;border:1.5px solid #D6D1C7;border-radius:8px;padding:10px 13px;font-size:13px;color:#1A1A1A;outline:none;}
+.settings-input:focus{border-color:#2A8A8A;}
+.settings-hint{font-size:11px;color:#9A8E82;margin-top:5px;line-height:1.5;}
+.settings-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:24px;}
+.settings-save{background:#0D1B2A;color:#F5F0E8;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;}
+.settings-cancel{background:transparent;border:1.5px solid #D6D1C7;border-radius:8px;padding:10px 16px;font-size:13px;color:#555;}
+.faire-sync-row{display:flex;gap:8px;align-items:center;margin-top:12px;}
+.faire-try-btn{background:#0D1B2A;color:#F5F0E8;border:none;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:700;white-space:nowrap;}
+.faire-try-btn:disabled{opacity:.5;}
+.faire-status{font-size:12px;padding:7px 10px;border-radius:6px;flex:1;}
+.faire-status.ok{background:rgba(26,123,78,.1);color:#1A7B4E;}
+.faire-status.err{background:rgba(178,74,44,.1);color:#B24A2C;}
+
+/* ── MODAL ─────────────────────────────────────────────────── */
 #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;align-items:center;justify-content:center;}
-.lrn{font-size:7px;color:#5BA89E;background:rgba(91,168,158,.15);padding:2px 7px;border-radius:7px;border:1px solid rgba(91,168,158,.3);}
+.modal-box{background:#FDFAF5;border-radius:13px;padding:24px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+.modal-sub{font-size:13px;color:#555;margin-bottom:18px;line-height:1.5;}
+.modal-btns{display:flex;gap:8px;}
+.modal-yes{flex:1;background:#0D1B2A;color:#F5F0E8;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;}
+.modal-no{flex:1;background:transparent;border:1.5px solid #ddd;border-radius:8px;padding:10px;font-size:13px;}
+
+/* ── TOAST ─────────────────────────────────────────────────── */
+#toast{display:none;position:fixed;bottom:18px;right:18px;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;color:#F5F0E8;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);}
 </style>
 </head>
 <body>
-<div id="hdr">
-  <span class="logo">ALIMO</span>
-  <div class="hdiv"></div>
-  <span class="hsub">Wholesale Dashboard</span>
-  <button class="sync-btn" id="sync-btn" onclick="syncGmail()">⟳ Sync Gmail</button>
-  <div id="tab-counts"></div>
-  <div id="learn-badge"></div>
-</div>
-<div id="body">
-  <div id="side">
-    <div class="stabs" id="stabs"></div>
-    <div class="ssch"><input id="srch" placeholder="Search shops..." oninput="onSearch(this.value)"/></div>
-    <div class="slist" id="slist"></div>
+<div id="root">
+  <div id="hdr">
+    <span class="logo">ALIMO</span>
+    <div class="hd"></div>
+    <span class="hsub">Wholesale Dashboard</span>
+    <div id="htabs"></div>
+    <button class="hbtn sync-btn" id="sync-btn" onclick="syncGmail()">⟳ Sync Gmail</button>
+    <button class="hbtn settings-btn" onclick="openSettings()" title="Settings">⚙</button>
+    <div id="lrn-badge"></div>
   </div>
-  <div id="det"></div>
+  <div id="body">
+    <div id="side">
+      <div class="stabs" id="stabs"></div>
+      <div class="srch"><input id="srch" placeholder="Search shops…" oninput="onSearch(this.value)"/></div>
+      <div id="slist"></div>
+    </div>
+    <div id="det"></div>
+  </div>
 </div>
-<div id="toast"></div>
+
+<div id="settings" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-box">
+    <div class="settings-title">Settings</div>
+    <div class="settings-sub">Connect Faire to sync your retailer contacts automatically. Get your API token from your Faire Brand Portal → Settings → API.</div>
+    <div class="settings-section">
+      <label class="settings-label">Faire API Token</label>
+      <input class="settings-input" id="faire-token-input" placeholder="faire_token_..." type="password"/>
+      <div class="settings-hint">Found in Faire Brand Portal → Settings → Developer API. Allows syncing your retailer contacts and order history directly into this dashboard.</div>
+      <div class="faire-sync-row">
+        <button class="faire-try-btn" id="faire-try-btn" onclick="tryFaireSync()">Sync from Faire</button>
+        <div class="faire-status" id="faire-status" style="display:none"></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <label class="settings-label">Import Faire CSV</label>
+      <div class="settings-hint">Alternatively, export your contacts from Faire Brand Portal → Contacts → Export, then paste the CSV data below to import.</div>
+      <textarea class="settings-input" id="faire-csv" rows="3" placeholder="Paste CSV data here…" style="margin-top:6px;resize:vertical;"></textarea>
+      <button class="faire-try-btn" onclick="importFaireCSV()" style="margin-top:8px;">Import CSV</button>
+    </div>
+    <div class="settings-actions">
+      <button class="settings-cancel" onclick="closeSettings()">Close</button>
+      <button class="settings-save" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal" onclick="if(event.target===this)closeModal()"></div>
+<div id="toast"></div>
+
 <script>
 const P1=`Hi Chris and team,\n\nMy name is Alimo and I am an artist from Oregon, based in Brooklyn.\nBig fan of Pilgrim\n\nFor some background, I make bold, colorful ocean and surf prints and goods including puzzles, air fresheners and stickers that could be a good extension to all your goods in the shop.\n\nI am currently stocked at Greenroom Gallery in Hawaii and a variety of other stores in the states. I'd love to talk shop on carrying some of my work at the store if there was an opportunity.\n\nYou can browse my wholesale catalog at https://alimofun.faire.com. If you join today you can get 50% off your first order, up to $150, and 1 year of free shipping.\n\nWould love to chat more. Cheers!\n\nThanks,\nAlimo\nalimofun.com\n@alimofun`;
 const P2=`Hi guys,\n\nMy name is Alimo and I am an artist from Oregon, based in Brooklyn. I came across Thalia a while back. Friends like Russ Pope and Matthew Allen have worked with you guys. Figured I'd reach out and say hello.\n\nFor some background, I make bold, colorful ocean and surf prints and goods, including puzzles, air fresheners and stickers. Given that you host monthly art shows and have always had one foot in the art community there in Laguna, I think my work could be a natural fit in the store.\n\nI am currently stocked at Greenroom Gallery in Hawaii and have done commercial work with Patagonia, Swatch and the Portland Trail Blazers. You can browse my wholesale catalog at https://alimofun.faire.com.\n\nHope to chat soon.\n\nThanks,\nAlimo\nalimofun.com\n@alimofun`;
 
-const DATA=[
-  // ── CONTACTED ───────────────────────────────────────────────────────────────
+const BASE_SHOPS=[
   {id:'c0',seg:'cold',name:'Pilgrim Surf + Supply',city:'Brooklyn',state:'NY',email:'online@pilgrimsurfsupply.com',contact:'Chris Gentile',web:'pilgrimsurfsupply.com',status:'contacted',sentDate:'Mar 06, 2026',source:'Cold lead',b:['Founded by visual artist Chris Gentile','Brooklyn community hub for artists and musicians','Has stores in Tokyo and Kyoto']},
-  {id:'c2',seg:'cold',name:'Thalia Surf Shop',city:'Laguna Beach',state:'CA',email:'orders@thaliasurf.com',contact:'Nick Cocores',web:'thaliasurf.com',status:'contacted',sentDate:'Apr 13, 2026',source:'Cold lead',b:['Owner Nick Cocores champions indie and emerging brands','Monthly art shows and concerts next to the shop','Near Laguna Art Walk — strong collector community']},
-
-  // ── CALIFORNIA ──────────────────────────────────────────────────────────────
+  {id:'c2',seg:'cold',name:'Thalia Surf Shop',city:'Laguna Beach',state:'CA',email:'orders@thaliasurf.com',contact:'Nick Cocores',web:'thaliasurf.com',status:'contacted',sentDate:'Apr 13, 2026',source:'Cold lead',b:['Owner Nick Cocores champions indie and emerging brands','Monthly art shows and concerts next to the shop','Near Laguna Art Walk']},
   {id:'c1',seg:'cold',name:'Mollusk Surf Shop',city:'San Francisco',state:'CA',email:'wholesale@mollusksurfshop.com',contact:'',web:'mollusksurfshop.com',status:'not_contacted',source:'Cold lead',b:['Gallery section Slow Motions sells original art $300-2500','Family owned since 2005, art-filled treehouse interior','Hosts regular art shows and live music']},
-  {id:'c3',seg:'cold',name:'Pemulis Water & Power',city:'San Francisco',state:'CA',email:'molly@pemulis.cool',contact:'Molly Thomas',web:'pemuliswaterandpower.com',status:'not_contacted',source:'Cold lead',b:['New 2023 shop in the Outer Sunset, right next to Mollusk','Carries an Art section — selling prints and lifestyle goods','Founded by a woman surfer, carries curated indie brands']},
+  {id:'c3',seg:'cold',name:'Pemulis Water & Power',city:'San Francisco',state:'CA',email:'molly@pemulis.cool',contact:'Molly Thomas',web:'pemuliswaterandpower.com',status:'not_contacted',source:'Cold lead',b:['New 2023 shop in the Outer Sunset, right next to Mollusk','Carries an Art section, selling prints and lifestyle goods','Founded by a woman surfer, curated indie brands']},
   {id:'c4',seg:'cold',name:'Public Land',city:'San Francisco',state:'CA',email:'info@publiclandstore.com',contact:'',web:'publiclandstore.com',status:'not_contacted',source:'Cold lead',b:['Gallery space hosting Jeff Canham exhibitions','Curated outdoor lifestyle boutique with arts focus']},
-  {id:'c5',seg:'cold',name:'Artisans & Agency',city:'Santa Cruz',state:'CA',email:'info@artisanssantacruz.com',contact:'',web:'artisanssantacruz.com',status:'not_contacted',source:'Cold lead',b:['Carries Kris Goto prints — direct peer overlap with Alimo','Curated surf art boutique in Santa Cruz']},
+  {id:'c5',seg:'cold',name:'Artisans & Agency',city:'Santa Cruz',state:'CA',email:'info@artisanssantacruz.com',contact:'',web:'artisanssantacruz.com',status:'not_contacted',source:'Cold lead',b:['Carries Kris Goto prints, direct peer overlap with Alimo','Curated surf art boutique in Santa Cruz']},
   {id:'c6',seg:'cold',name:'Proof Lab',city:'Mill Valley',state:'CA',email:'',contact:'',web:'prooflab.com',status:'not_contacted',source:'Cold lead',b:['Marin County boutique surf shop with curated indie brands','CJ Nelson longboard dealer, editorial aesthetic']},
   {id:'c7',seg:'cold',name:'Atacama Surf Shop',city:'Encinitas',state:'CA',email:'',contact:'Clarke Ledger',web:'atacamasurf.com',status:'not_contacted',source:'Cold lead',b:['Leucadia boutique on N Coast Hwy 101','Explicitly welcomes collabs with emerging artists','Carries Patagonia, RVCA, and curated indie surf brands']},
-  {id:'c8',seg:'cold',name:'Iron & Resin Garage',city:'Ventura',state:'CA',email:'alan@ironandresin.com',contact:'Alan',web:'ironandresin.com',status:'not_contacted',source:'Cold lead',b:['Ventura cultural hub — vintage finds, surf, moto gear','Carries eclectic mix of art, clothing, antiques, surfboards','Strong print-buying customer base']},
-  {id:'c9',seg:'cold',name:'Deus Ex Machina',city:'Venice',state:'CA',email:'',contact:'',web:'deuscustoms.com',status:'not_contacted',source:'Cold lead',b:['Venice Beach cultural hub — cafe, shop, events','Global brand with LA, Sydney, Tokyo, Bali locations','Strong art programming and collab culture']},
-  {id:'c10',seg:'cold',name:'Almond Surf Shop',city:'Newport Beach',state:'CA',email:'',contact:'',web:'almondsurfboards.com',status:'not_contacted',source:'Cold lead',b:['Boutique longboard brand with curated Newport Beach shop','Strong aesthetic heritage — editorial and artful','Carries indie apparel and art prints alongside boards']},
-  {id:'c11',seg:'cold',name:'Bird Rock Surf Shop',city:'La Jolla',state:'CA',email:'info@birdrocksurf.com',contact:'Matt Murphy',web:'birdrocksurf.com',status:'not_contacted',source:'Cold lead',b:['Family-owned since 2007, community surf hub in La Jolla','Friday night food trucks and live music in parking lot','Past Faire customer with $944 in previous orders']},
-
-  // ── HAWAII ───────────────────────────────────────────────────────────────────
-  {id:'c12',seg:'cold',name:'House of Mana Up',city:'Honolulu',state:'HI',email:'info@houseofmanaup.com',contact:'',web:'houseofmanaup.com',status:'not_contacted',source:'Cold lead',b:['Hawaii-focused brand incubator and boutique','Carries Kris Goto and Nick Kuchar — direct peer overlap','Multiple locations including Royal Hawaiian Center']},
-  {id:'c13',seg:'cold',name:'No. 808',city:'Haleiwa',state:'HI',email:'',contact:'',web:'number808.com',status:'not_contacted',source:'Cold lead',b:['North Shore boutique same strip as Greenroom Gallery','Bold colorful aesthetic — strong Alimo alignment','Art and lifestyle goods with island culture focus']},
-
-  // ── OREGON ───────────────────────────────────────────────────────────────────
-  {id:'c14',seg:'cold',name:'Moment Surf Company',city:'Pacific City',state:'OR',email:'info@momentsurfco.com',contact:'',web:'momentsurf.com',status:'not_contacted',source:'Cold lead',b:['CJ Nelson dealer on the Oregon Coast','Alimo is from Oregon — strong local angle','Curated boutique with tight community ties']},
-  {id:'c15',seg:'cold',name:'Cleanline Surf',city:'Seaside',state:'OR',email:'support@cleanlinesurf.com',contact:'',web:'cleanlinesurfsport.com',status:'not_contacted',source:'Cold lead',b:['Oregon coast institution since 1977','Commissions original artwork from local artists','Same Oregon coast as active Faire account Salt']},
-
-  // ── NEW YORK ──────────────────────────────────────────────────────────────────
-  {id:'c16',seg:'cold',name:'Saturdays NYC',city:'New York',state:'NY',email:'',contact:'',web:'saturdaysnyc.com',status:'not_contacted',source:'Cold lead',b:['Sells fine art alongside surf gear in SoHo','4 global locations: NYC, Tokyo, Sydney, Melbourne','One email reaches all storefronts']},
-  {id:'c17',seg:'cold',name:'Whalebone',city:'Montauk',state:'NY',email:'shop@whaleboneapparel.com',contact:'',web:'whaleboneapparel.com',status:'not_contacted',source:'Cold lead',b:['Coastal lifestyle brand since 2010 in Montauk and Newport RI','Magazine + apparel + print culture — perfect match','28K Instagram followers, strong art collector community']},
-
-  // ── FLORIDA ───────────────────────────────────────────────────────────────────
-  {id:'c18',seg:'cold',name:'Gypsy Life Surf Shop',city:'West Palm Beach',state:'FL',email:'hello@gypsylifesurfshop.com',contact:'',web:'gypsylifesurfshop.com',status:'not_contacted',source:'Cold lead',b:['Curated lifestyle boutique for the bohemian surfer in WPB','Carries home decor, art, jewelry alongside surf gear','39K Instagram followers — highly engaged community']},
-  {id:'c19',seg:'cold',name:'NiSea',city:'Miami',state:'FL',email:'anais@shopnisea.com',contact:'Anais Pozo',web:'shopnisea.com',status:'not_contacted',source:'Cold lead',b:['Former Faire customer — Anais Pozo email on file','Miami boutique surf and lifestyle shop']},
-
-  // ── MIDWEST ───────────────────────────────────────────────────────────────────
-  {id:'c20',seg:'cold',name:'SoHa Surf Shop',city:'South Haven',state:'MI',email:'sales@sohasurfshop.com',contact:'Chris Campbell',web:'sohasurfshop.com',status:'not_contacted',source:'Cold lead',b:['Largest surf shop on Lake Michigan, 7 locations','Unexpected inland market — strong surf-lifestyle community','Family owned since 2005, open year-round']},
-  {id:'c21',seg:'cold',name:'Foursided Card & Gift',city:'Chicago',state:'IL',email:'2958clark@foursided.com',contact:'Sarah Padilla',web:'foursided.com',status:'not_contacted',source:'Cold lead',b:['Former Faire customer — Sarah Padilla email on file','Chicago curated gift and art boutique in Lincoln Park']},
-
-  // ── EAST COAST ────────────────────────────────────────────────────────────────
-  {id:'c22',seg:'cold',name:'Wave Riding Vehicles',city:'Kill Devil Hills',state:'NC',email:'',contact:'',web:'waveridingvehicles.com',status:'not_contacted',source:'Cold lead',b:['OBX surf institution since 1967 — NC, VA, HI doors','One relationship reaches multiple storefronts','Deep Outer Banks surf heritage']},
-  {id:'c23',seg:'cold',name:'Glide Surf Co.',city:'Asbury Park',state:'NJ',email:'',contact:'',web:'glidesurfco.com',status:'not_contacted',source:'Cold lead',b:['Boutique surf shop in Asbury Park arts district','Curated handmade boards from Ryan Lovelace','Natural fit for print art']},
-
-  // ── INTERNATIONAL ─────────────────────────────────────────────────────────────
-  {id:'c24',seg:'cold',name:'Helder Supply',city:'Biarritz',state:'',country:'France',email:'contact@heldersupply.com',contact:'Jeremie Kerchrom',web:'heldersupply.com',status:'not_contacted',source:'Cold lead',b:['Art gallery and surf lifestyle concept store in Biarritz','Sells 250+ surf photography prints','Right across from Grande Plage — heart of European surf']},
-  {id:'c25',seg:'cold',name:'South Swell',city:'Osaka',state:'',country:'Japan',email:'info@southswell.jp',contact:'',web:'southswell.jp',status:'not_contacted',source:'Cold lead',b:['Cafe and surf shop concept in Osaka','Carries Christenson boards, Captain Fins','Surf movie screenings and community events']},
-  {id:'c26',seg:'cold',name:'BOX Barcelona',city:'Barcelona',state:'',country:'Spain',email:'shop@boxbarcelona.com',contact:'',web:'boxbarcelona.com',status:'not_contacted',source:'Cold lead',b:['Boutique surf and skate shop in El Born Barcelona','Carries curated indie lifestyle brands']},
-  {id:'c27',seg:'cold',name:'Noosa Longboards',city:'Noosa Heads',state:'',country:'Australia',email:'',contact:'',web:'noosalongboards.com',status:'not_contacted',source:'Cold lead',b:['Iconic surf lifestyle shop on Hastings Street Noosa','Explicitly carries art and collectibles alongside boards','Hosts surfboard exhibitions and film screenings']},
-  {id:'c28',seg:'cold',name:'Salt Tofino',city:'Tofino',state:'BC',country:'Canada',email:'',contact:'',web:'salttofino.com',status:'not_contacted',source:'Cold lead',b:["Tofino's premier curated gift shop since 2016","Carries local artisan goods, prints, home and lifestyle","Strong surf culture destination on Vancouver Island"]},
-  {id:'c29',seg:'cold',name:'Surf Sister',city:'Tofino',state:'BC',country:'Canada',email:'office@surfsister.com',contact:'',web:'surfsister.com',status:'not_contacted',source:'Cold lead',b:['Iconic Tofino surf school and lifestyle shop since 1999','Curated apparel, prints, gifts for the surf community','Strong community ties and repeat customer base']},
-  {id:'c30',seg:'cold',name:'Bons: Casa de Verano',city:'Chiba',state:'',country:'Japan',email:'',contact:'Yuko Shimajiri',web:'bons-ca.com',status:'not_contacted',source:'Cold lead',b:['Run by surfer Yuko Shimajiri, curates worldwide finds','Top Japanese surf shop per Seea surf magazine','Chiba is the main surf break area for greater Tokyo']},
-
-  // ── FAIRE ACCOUNTS ────────────────────────────────────────────────────────────
+  {id:'c8',seg:'cold',name:'Iron & Resin Garage',city:'Ventura',state:'CA',email:'alan@ironandresin.com',contact:'Alan',web:'ironandresin.com',status:'not_contacted',source:'Cold lead',b:['Ventura cultural hub, vintage finds, surf, moto gear','Carries eclectic mix of art, clothing, antiques, surfboards','Strong print-buying customer base']},
+  {id:'c9',seg:'cold',name:'Deus Ex Machina',city:'Venice',state:'CA',email:'',contact:'',web:'deuscustoms.com',status:'not_contacted',source:'Cold lead',b:['Venice Beach cultural hub, cafe, shop, events','Global brand with LA, Sydney, Tokyo, Bali locations','Strong art programming and collab culture']},
+  {id:'c10',seg:'cold',name:'Almond Surf Shop',city:'Newport Beach',state:'CA',email:'',contact:'',web:'almondsurfboards.com',status:'not_contacted',source:'Cold lead',b:['Boutique longboard brand with curated Newport Beach shop','Carries indie apparel and art prints alongside boards']},
+  {id:'c11',seg:'cold',name:'Bird Rock Surf Shop',city:'La Jolla',state:'CA',email:'info@birdrocksurf.com',contact:'Matt Murphy',web:'birdrocksurf.com',status:'not_contacted',source:'Cold lead',b:['Family-owned since 2007, community surf hub in La Jolla','Friday night food trucks and live music in parking lot','Past Faire customer']},
+  {id:'c12',seg:'cold',name:'House of Mana Up',city:'Honolulu',state:'HI',email:'info@houseofmanaup.com',contact:'',web:'houseofmanaup.com',status:'not_contacted',source:'Cold lead',b:['Hawaii-focused brand incubator and boutique','Carries Kris Goto and Nick Kuchar, direct peer overlap','Multiple locations including Royal Hawaiian Center']},
+  {id:'c13',seg:'cold',name:'No. 808',city:'Haleiwa',state:'HI',email:'',contact:'',web:'number808.com',status:'not_contacted',source:'Cold lead',b:['North Shore boutique same strip as Greenroom Gallery','Bold colorful aesthetic, strong Alimo alignment']},
+  {id:'c14',seg:'cold',name:'Moment Surf Company',city:'Pacific City',state:'OR',email:'info@momentsurfco.com',contact:'',web:'momentsurf.com',status:'not_contacted',source:'Cold lead',b:['CJ Nelson dealer on the Oregon Coast','Alimo is from Oregon, strong local angle']},
+  {id:'c15',seg:'cold',name:'Cleanline Surf',city:'Seaside',state:'OR',email:'support@cleanlinesurf.com',contact:'',web:'cleanlinesurfsport.com',status:'not_contacted',source:'Cold lead',b:['Oregon coast institution since 1977','Commissions original artwork from local artists']},
+  {id:'c16',seg:'cold',name:'Saturdays NYC',city:'New York',state:'NY',email:'',contact:'',web:'saturdaysnyc.com',status:'not_contacted',source:'Cold lead',b:['Sells fine art alongside surf gear in SoHo','4 global locations: NYC, Tokyo, Sydney, Melbourne']},
+  {id:'c17',seg:'cold',name:'Whalebone',city:'Montauk',state:'NY',email:'shop@whaleboneapparel.com',contact:'',web:'whaleboneapparel.com',status:'not_contacted',source:'Cold lead',b:['Coastal lifestyle brand since 2010 in Montauk and Newport RI','Magazine + apparel + print culture, perfect match','28K Instagram followers, strong art collector community']},
+  {id:'c18',seg:'cold',name:'Gypsy Life Surf Shop',city:'West Palm Beach',state:'FL',email:'hello@gypsylifesurfshop.com',contact:'',web:'gypsylifesurfshop.com',status:'not_contacted',source:'Cold lead',b:['Curated lifestyle boutique for the bohemian surfer in WPB','Carries home decor, art, jewelry alongside surf gear','39K Instagram followers']},
+  {id:'c19',seg:'cold',name:'NiSea',city:'Miami',state:'FL',email:'anais@shopnisea.com',contact:'Anais Pozo',web:'shopnisea.com',status:'not_contacted',source:'Cold lead',b:['Former Faire customer, Anais Pozo email on file','Miami boutique surf and lifestyle shop']},
+  {id:'c20',seg:'cold',name:'SoHa Surf Shop',city:'South Haven',state:'MI',email:'sales@sohasurfshop.com',contact:'Chris Campbell',web:'sohasurfshop.com',status:'not_contacted',source:'Cold lead',b:['Largest surf shop on Lake Michigan, 7 locations','Family owned since 2005, open year-round','Unexpected inland market, strong surf-lifestyle community']},
+  {id:'c21',seg:'cold',name:'Foursided Card & Gift',city:'Chicago',state:'IL',email:'2958clark@foursided.com',contact:'Sarah Padilla',web:'foursided.com',status:'not_contacted',source:'Cold lead',b:['Former Faire customer, Sarah Padilla email on file','Chicago curated gift and art boutique in Lincoln Park']},
+  {id:'c22',seg:'cold',name:'Wave Riding Vehicles',city:'Kill Devil Hills',state:'NC',email:'',contact:'',web:'waveridingvehicles.com',status:'not_contacted',source:'Cold lead',b:['OBX surf institution since 1967, NC, VA, HI doors','One relationship reaches multiple storefronts']},
+  {id:'c23',seg:'cold',name:'Glide Surf Co.',city:'Asbury Park',state:'NJ',email:'',contact:'',web:'glidesurfco.com',status:'not_contacted',source:'Cold lead',b:['Boutique surf shop in Asbury Park arts district','Curated handmade boards from Ryan Lovelace']},
+  {id:'c24',seg:'cold',name:'Helder Supply',city:'Biarritz',state:'',country:'France',email:'contact@heldersupply.com',contact:'Jeremie Kerchrom',web:'heldersupply.com',status:'not_contacted',source:'Cold lead',b:['Art gallery and surf lifestyle concept store in Biarritz','Sells 250+ surf photography prints','Right across from Grande Plage']},
+  {id:'c25',seg:'cold',name:'South Swell',city:'Osaka',state:'',country:'Japan',email:'info@southswell.jp',contact:'',web:'southswell.jp',status:'not_contacted',source:'Cold lead',b:['Cafe and surf shop concept in Osaka','Carries Christenson boards, Captain Fins']},
+  {id:'c26',seg:'cold',name:'BOX Barcelona',city:'Barcelona',state:'',country:'Spain',email:'shop@boxbarcelona.com',contact:'',web:'boxbarcelona.com',status:'not_contacted',source:'Cold lead',b:['Boutique surf and skate shop in El Born Barcelona']},
+  {id:'c27',seg:'cold',name:'Noosa Longboards',city:'Noosa Heads',state:'',country:'Australia',email:'',contact:'',web:'noosalongboards.com',status:'not_contacted',source:'Cold lead',b:['Iconic surf lifestyle shop on Hastings Street Noosa','Explicitly carries art and collectibles alongside boards']},
+  {id:'c28',seg:'cold',name:'Salt Tofino',city:'Tofino',state:'BC',country:'Canada',email:'',contact:'',web:'salttofino.com',status:'not_contacted',source:'Cold lead',b:["Tofino's premier curated gift shop since 2016","Carries local artisan goods, prints, home and lifestyle"]},
+  {id:'c29',seg:'cold',name:'Surf Sister',city:'Tofino',state:'BC',country:'Canada',email:'office@surfsister.com',contact:'',web:'surfsister.com',status:'not_contacted',source:'Cold lead',b:['Iconic Tofino surf school and lifestyle shop since 1999','Curated apparel, prints, gifts for the surf community']},
+  {id:'c30',seg:'cold',name:'Bons: Casa de Verano',city:'Chiba',state:'',country:'Japan',email:'',contact:'Yuko Shimajiri',web:'bons-ca.com',status:'not_contacted',source:'Cold lead',b:['Run by surfer Yuko Shimajiri, curates worldwide finds','Top Japanese surf shop per Seea surf magazine']},
   {id:'f0',seg:'warm',name:'Traveler Surf Club',city:'Pacifica',state:'CA',email:'lauren@travelersurfclub.com',contact:'Lauren Diaz',rev:19130,orders:41,last:'Oct 13, 2025',days:145,source:'Faire',status:'not_contacted',b:[]},
   {id:'f1',seg:'warm',name:'General Store Paso Robles',city:'Paso Robles',state:'CA',email:'',contact:'Joeli Yaguda',rev:6001,orders:10,last:'Oct 05, 2025',days:153,source:'Faire',status:'not_contacted',b:[]},
   {id:'f2',seg:'warm',name:'Salt',city:'Lincoln City',state:'OR',email:'',contact:'Shelby Locke Cunningham',rev:5402,orders:16,last:'Apr 29, 2025',days:312,source:'Faire',status:'not_contacted',b:[]},
@@ -161,39 +274,130 @@ const DATA=[
   {id:'f19',seg:'lapsed',name:'The Aloha Bungalow',city:'Redondo Beach',state:'CA',email:'emily@thealohabungalow.com',contact:'Emily Poage',rev:1248,orders:4,last:'Dec 29, 2020',days:1894,source:'Faire',status:'not_contacted',b:[]},
 ];
 
-const PH={HI:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&q=60',CA:'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=700&q=60',OR:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=700&q=60',NY:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=700&q=60',FL:'https://images.unsplash.com/photo-1515404929826-76fff9fef6fe?w=700&q=60',NJ:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=700&q=60',NC:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=700&q=60',MI:'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=700&q=60',IL:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=700&q=60',ME:'https://images.unsplash.com/photo-1473621038790-b778b4750efe?w=700&q=60',CO:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=700&q=60',WY:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=700&q=60',BC:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=700&q=60',France:'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=700&q=60',Japan:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=700&q=60',Spain:'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=700&q=60',Australia:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=700&q=60',Canada:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=700&q=60',def:'https://images.unsplash.com/photo-1439405326854-014607f694d7?w=700&q=60'};
-const gp=c=>{if(c.country&&PH[c.country])return PH[c.country];return PH[c.state]||PH.def;};
-const TABS=[{id:'cold',l:'New Leads',i:'✦'},{id:'warm',l:'Follow Up',i:'↩'},{id:'lapsed',l:'Win-Back',i:'💤'},{id:'active',l:'Active',i:'✓'}];
-const N='#0D1B2A',KEY='alimo_v4';
+const PH={HI:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70',CA:'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=70',OR:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=70',NY:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=70',FL:'https://images.unsplash.com/photo-1515404929826-76fff9fef6fe?w=800&q=70',NC:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=800&q=70',MI:'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=70',IL:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=70',NJ:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=70',ME:'https://images.unsplash.com/photo-1473621038790-b778b4750efe?w=800&q=70',CO:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=70',WY:'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800&q=70',BC:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',France:'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&q=70',Japan:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=70',Spain:'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=70',Australia:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',Canada:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',def:'https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=70'};
+const gp=s=>{if(s.country&&PH[s.country])return PH[s.country];return PH[s.state]||PH.def;};
 
-function loadSaved(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=DATA.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync}));}catch(e){}}
+const TABS=[
+  {id:'cold',l:'New Leads',i:'✦'},
+  {id:'warm',l:'Follow Up',i:'↩'},
+  {id:'lapsed',l:'Win-Back',i:'💤'},
+  {id:'active',l:'Active',i:'✓'},
+  {id:'contacted',l:'Contacted',i:'📬'},
+];
+
+const N='#0D1B2A',KEY='alimo_v5';
+
+function loadSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate})),learned,tab,selId,lastSync,faireToken}));}catch(e){}}
+
 const sv=loadSaved();
-let shops=DATA.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate}:{...d};});
-let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null;
+let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate}:{...d};});
+let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'';
 let drafts=null,dIdx=0,body='',subj='',gen=false,send=false,err='',srchQ='';
-const byTab=t=>shops.filter(s=>s.seg===t);
+
+const byTab=t=>t==='contacted'?shops.filter(s=>s.status==='contacted'):shops.filter(s=>s.seg===t);
 const getSel=()=>shops.find(s=>s.id===selId);
 const cnts=()=>{const o={};TABS.forEach(t=>o[t.id]=byTab(t.id).length);return o;};
-const filt=()=>{const q=srchQ.toLowerCase();return byTab(tab).filter(s=>[s.name,s.city,s.contact||'',s.state||'',s.country||''].some(x=>x.toLowerCase().includes(q)));};
+const filt=()=>{if(tab==='contacted')return byTab('contacted');const q=srchQ.toLowerCase();return byTab(tab).filter(s=>[s.name,s.city,s.contact||'',s.state||'',s.country||''].some(x=>x.toLowerCase().includes(q)));};
+
 let tT;
 function toast(m,e=false){const el=document.getElementById('toast');el.textContent=m;el.style.background=e?'#B24A2C':N;el.style.display='block';clearTimeout(tT);tT=setTimeout(()=>el.style.display='none',3500);}
 function onSearch(v){srchQ=v;renderList();}
 function selShop(id){selId=id;drafts=null;body='';dIdx=0;err='';save();renderDetail();}
-function selTab(t){tab=t;srchQ='';drafts=null;body='';err='';const f=byTab(t)[0];if(f)selId=f.id;save();document.getElementById('srch').value='';renderAll();}
+function selTab(t){tab=t;srchQ='';drafts=null;body='';err='';const f=byTab(t)[0];if(f)selId=f.id;save();const si=document.getElementById('srch');if(si)si.value='';renderAll();}
 function setDI(i){dIdx=i;const d=i===0?drafts.a:drafts.b;if(d){body=d;subj=i===0?drafts.sa:drafts.sb;}renderDetail();}
-function markSent(id,b2){const now=new Date().toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});shops=shops.map(s=>s.id===id?{...s,status:'contacted',sentDate:now}:s);if(b2){learned=[...learned,b2].filter((v,i,a)=>a.indexOf(v)===i).slice(-10);}save();closeModal();renderAll();}
+
+function markSent(id,b2){
+  const now=new Date().toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
+  shops=shops.map(s=>s.id===id?{...s,status:'contacted',sentDate:now}:s);
+  if(b2){learned=[...learned,b2].filter((v,i,a)=>a.indexOf(v)===i).slice(-10);}
+  save();closeModal();renderAll();
+}
+
 function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('modal').innerHTML='';}
-function openModal(id,name){const m=document.getElementById('modal');m.style.display='flex';m.innerHTML=`<div style="background:#FDFAF5;border-radius:12px;padding:22px;width:290px;font-family:sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.3);"><p style="font-size:15px;font-weight:700;margin:0 0 8px">Mark as Sent</p><p style="font-size:12px;color:#555;margin:0 0 16px">Confirm you sent to <strong>${name}</strong>?</p><div style="display:flex;gap:8px;"><button onclick="markSent('${id}',null)" style="flex:1;background:${N};color:#F5F0E8;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Yes, mark sent</button><button onclick="closeModal()" style="flex:1;background:transparent;border:1px solid #ddd;border-radius:7px;padding:9px;font-size:12px;cursor:pointer;">Cancel</button></div></div>`;}
+function openModal(id,name){
+  const m=document.getElementById('modal');m.style.display='flex';
+  m.innerHTML=`<div class="modal-box"><div class="modal-title">Mark as Sent</div><div class="modal-sub">Confirm you sent an email to <strong>${name}</strong>?</div><div class="modal-btns"><button class="modal-yes" onclick="markSent('${id}',null)">Yes, mark sent</button><button class="modal-no" onclick="closeModal()">Cancel</button></div></div>`;
+}
+
+function openSettings(){
+  document.getElementById('faire-token-input').value=faireToken;
+  document.getElementById('settings').style.display='flex';
+  document.getElementById('faire-status').style.display='none';
+}
+function closeSettings(){document.getElementById('settings').style.display='none';}
+function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();save();closeSettings();toast('Settings saved!');}
+
+async function tryFaireSync(){
+  const token=document.getElementById('faire-token-input').value.trim();
+  if(!token){toast('Enter your Faire API token first',true);return;}
+  const btn=document.getElementById('faire-try-btn');
+  const status=document.getElementById('faire-status');
+  btn.disabled=true;btn.textContent='Syncing…';status.style.display='none';
+  try{
+    const res=await fetch('https://www.faire.com/api/v2/brand/retailer-account-leads?limit=50',{headers:{'Authorization':'Bearer '+token,'X-FAIRE-ACCESS-TOKEN':token}});
+    if(!res.ok)throw new Error('API error '+res.status);
+    const data=await res.json();
+    const retailers=data.retailer_account_leads||data.contacts||[];
+    let added=0;
+    retailers.forEach(r=>{
+      const email=(r.email||r.retailer?.email||'').toLowerCase();
+      const name=r.name||r.retailer?.name||r.store_name||'';
+      if(!email&&!name)return;
+      const exists=shops.find(s=>s.email&&s.email.toLowerCase()===email);
+      if(!exists&&name){
+        shops.push({id:'faire_'+Date.now()+'_'+added,seg:'warm',name,city:r.city||r.retailer?.city||'',state:r.state||r.retailer?.state||'',email,contact:r.contact_name||'',rev:r.total_order_amount||0,orders:r.order_count||0,source:'Faire',status:'not_contacted',b:[]});
+        added++;
+      }
+    });
+    save();renderAll();
+    status.className='faire-status ok';status.textContent=`Synced! ${added} new contacts added.`;status.style.display='block';
+  }catch(e){
+    status.className='faire-status err';
+    status.textContent=e.message.includes('Failed to fetch')||e.message.includes('CORS')?'CORS blocked. Use CSV import below instead.':'Error: '+e.message;
+    status.style.display='block';
+  }
+  btn.disabled=false;btn.textContent='Sync from Faire';
+}
+
+function importFaireCSV(){
+  const csv=document.getElementById('faire-csv').value.trim();
+  if(!csv){toast('Paste CSV data first',true);return;}
+  try{
+    const lines=csv.split('\n').filter(l=>l.trim());
+    const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim().toLowerCase());
+    const storeIdx=headers.findIndex(h=>h.includes('store'));
+    const emailIdx=headers.findIndex(h=>h.includes('email'));
+    const contactIdx=headers.findIndex(h=>h.includes('contact'));
+    const cityIdx=headers.findIndex(h=>h.includes('city'));
+    const stateIdx=headers.findIndex(h=>h.includes('state'));
+    const amtIdx=headers.findIndex(h=>h.includes('amount')||h.includes('revenue'));
+    const ordIdx=headers.findIndex(h=>h.includes('order'));
+    let added=0;
+    lines.slice(1).forEach(line=>{
+      const cols=line.split(',').map(c=>c.replace(/"/g,'').trim());
+      const name=storeIdx>=0?cols[storeIdx]:'';
+      const email=emailIdx>=0?cols[emailIdx].toLowerCase():'';
+      if(!name)return;
+      const exists=shops.find(s=>(email&&s.email&&s.email.toLowerCase()===email)||(s.name.toLowerCase()===name.toLowerCase()));
+      if(!exists){
+        shops.push({id:'csv_'+Date.now()+'_'+added,seg:'warm',name,city:cityIdx>=0?cols[cityIdx]:'',state:stateIdx>=0?cols[stateIdx]:'',email:email||'',contact:contactIdx>=0?cols[contactIdx]:'',rev:amtIdx>=0?parseFloat(cols[amtIdx])||0:0,orders:ordIdx>=0?parseInt(cols[ordIdx])||0:0,source:'Faire',status:'not_contacted',b:[]});
+        added++;
+      }
+    });
+    save();renderAll();closeSettings();
+    toast(`Imported ${added} new contacts from CSV!`);
+  }catch(e){toast('CSV parse error: '+e.message,true);}
+}
 
 async function syncGmail(){
   const btn=document.getElementById('sync-btn');
-  btn.disabled=true;btn.classList.add('syncing');btn.textContent='⟳ Syncing...';
+  btn.disabled=true;btn.classList.add('syncing');btn.textContent='⟳ Syncing…';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       model:'claude-sonnet-4-6',max_tokens:2000,
       mcp_servers:[{type:'url',url:'https://gmail.mcp.claude.com/mcp',name:'gmail'}],
-      messages:[{role:'user',content:`Search my Gmail sent folder for ALL wholesale outreach emails from hello@alimofun.com. Use gmail_search_messages with query: "from:hello@alimofun.com is:sent" maxResults: 50. For each result return a JSON array: [{"to":"email@example.com","date":"Apr 13, 2026"}]. Return ONLY the JSON array, nothing else.`}]
+      messages:[{role:'user',content:`Search Gmail sent folder for ALL emails from hello@alimofun.com. Use gmail_search_messages with query: "from:hello@alimofun.com is:sent" maxResults: 50. Return ONLY a JSON array: [{"to":"email","date":"Apr 13, 2026","body":"email body text"}]. Nothing else.`}]
     })});
     const data=await res.json();
     const raw=data.content?.find(b=>b.type==='text')?.text||'';
@@ -201,12 +405,25 @@ async function syncGmail(){
     if(!match)throw new Error('No data returned');
     const emails=JSON.parse(match[0]);
     const sentMap={};
-    emails.forEach(e=>{if(e.to&&e.date){const a=e.to.toLowerCase().trim().replace(/.*<(.+)>/,'$1');if(!sentMap[a]||new Date(e.date)>new Date(sentMap[a]))sentMap[a]=e.date;}});
+    emails.forEach(e=>{
+      if(e.to&&e.date){
+        const a=e.to.toLowerCase().trim().replace(/.*<(.+)>/,'$1');
+        if(!sentMap[a]||new Date(e.date)>new Date(sentMap[a].date)){
+          sentMap[a]={date:e.date,body:e.body||''};
+        }
+      }
+    });
     let updated=0;
     shops=shops.map(s=>{
       if(!s.email)return s;
       const a=s.email.toLowerCase().trim();
-      if(sentMap[a]){if(s.status!=='contacted'){updated++;}return{...s,status:'contacted',sentDate:sentMap[a]};}
+      if(sentMap[a]){
+        if(s.status!=='contacted')updated++;
+        if(sentMap[a].body&&!learned.includes(sentMap[a].body)){
+          learned=[...learned,sentMap[a].body].filter((v,i,arr)=>arr.indexOf(v)===i).slice(-10);
+        }
+        return{...s,status:'contacted',sentDate:sentMap[a].date};
+      }
       return s;
     });
     lastSync=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -220,18 +437,18 @@ async function generate(){
   const s=getSel();if(!s||gen)return;
   gen=true;err='';drafts=null;renderDetail();
   try{
-    const ln=learned.length?'\n\nReal emails Alimo sent. Match this voice exactly:\n---\n'+learned.slice(-3).join('\n---\n'):'';
+    const ln=learned.length?'\n\nReal emails Alimo has sent. Study carefully and match this voice:\n---\n'+learned.slice(-3).join('\n---\n'):'';
     const buls=s.b?.length?'About this shop:\n'+s.b.map(x=>'- '+x).join('\n'):'';
-    const hist=s.rev?'Faire history: $'+s.rev.toLocaleString()+' total, '+s.orders+' orders, last: '+s.last+' ('+s.days+' days ago). Reference warmly.':'New prospect, never ordered from Alimo.';
-    const sys=`You write wholesale emails for Alimo (Sean Kesterson), artist from Oregon based in Brooklyn. Makes bold colorful ocean/surf prints, puzzles, air fresheners, stickers. Stocked at Greenroom Gallery Hawaii. Commercial work: Patagonia, Swatch, Portland Trail Blazers.\n\nRULES: Short punchy sentences. Fragments OK. Casual warm genuine. NEVER use em dashes. No hyphens joining phrases. Short paragraphs. Humble ask. Reference something specific about this shop. Always include https://alimofun.faire.com, 50% off first order up to $150 1 year free shipping, Greenroom Gallery Hawaii.\n\nSIGN OFF exactly:\nCheers!\n\nThanks,\nAlimo\nalimofun.com\n@alimofun\n\nSUBJECT: Personal and specific to THIS shop, short, human, a bit fun. Two different ones.${ln}`;
-    const usr=`Two different wholesale outreach emails from Alimo to this shop. Personal to THIS shop. SHORT, 4 paragraphs max.\n\nShop: ${s.name}\nLocation: ${s.city}${s.state?', '+s.state:''}${s.country?', '+s.country:''}\n${s.contact?'Contact: '+s.contact+'\n':''}${s.web?'Website: '+s.web+'\n':''}${buls}\n${hist}\n\nReturn EXACTLY:\nSUBJECT_A\n[subject]\nDRAFT_A\n[email]\nSUBJECT_B\n[subject]\nDRAFT_B\n[email]`;
+    const hist=s.rev?'Faire history: $'+s.rev.toLocaleString()+' total, '+s.orders+' orders, last: '+s.last+' ('+s.days+' days ago). Reference this warmly.':'New prospect, never ordered from Alimo.';
+    const sys=`You write wholesale emails for Alimo (Sean Kesterson), artist from Oregon based in Brooklyn. Makes bold colorful ocean/surf prints, puzzles, air fresheners, stickers. Stocked at Greenroom Gallery Hawaii. Commercial work: Patagonia, Swatch, Portland Trail Blazers.\n\nRULES: Short punchy sentences. Fragments totally OK. Casual warm genuine. NEVER use em dashes. No hyphens joining phrases. Short paragraphs. Humble ask. Reference something specific about this shop. Always include https://alimofun.faire.com, 50% off first order up to $150 1 year free shipping, Greenroom Gallery Hawaii.\n\nSIGN OFF exactly:\nCheers!\n\nThanks,\nAlimo\nalimofun.com\n@alimofun\n\nSUBJECT: Personal and specific to THIS shop. Short, human, a bit fun. Two completely different ones for A and B.${ln}`;
+    const usr=`Two different wholesale outreach emails from Alimo to this specific shop. Make each feel genuinely personal. SHORT, 4 paragraphs max.\n\nShop: ${s.name}\nLocation: ${s.city}${s.state?', '+s.state:''}${s.country?', '+s.country:''}\n${s.contact?'Contact: '+s.contact+'\n':''}${s.web?'Website: '+s.web+'\n':''}${buls}\n${hist}\n\nReturn EXACTLY:\nSUBJECT_A\n[subject]\nDRAFT_A\n[email]\nSUBJECT_B\n[subject]\nDRAFT_B\n[email]`;
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1400,system:sys,messages:[{role:'user',content:usr}]})});
     if(!r.ok)throw new Error('API '+r.status);
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     const raw=d.content?.find(b=>b.type==='text')?.text||'';
     const saM=raw.match(/SUBJECT_A\n(.*?)\nDRAFT_A/s),aM=raw.match(/DRAFT_A\n([\s\S]*?)(?=SUBJECT_B)/),sbM=raw.match(/SUBJECT_B\n(.*?)\nDRAFT_B/s),bM=raw.match(/DRAFT_B\n([\s\S]*)$/);
     const sa=saM?saM[1].trim():'Hey from Alimo',bA=aM?aM[1].trim():raw.trim(),sb=sbM?sbM[1].trim():'surf art from an Oregon artist',bB=bM?bM[1].trim():'';
-    if(!bA)throw new Error('Could not parse');
+    if(!bA)throw new Error('Could not parse response');
     drafts={a:bA,b:bB||bA,sa,sb};body=bA;subj=sa;
   }catch(e){err=e.message;}
   finally{gen=false;renderDetail();}
@@ -247,72 +464,163 @@ async function saveGmail(){
   finally{send=false;}
 }
 
-function chip(l,v,bg,tc){return`<div class="chip"${bg?` style="background:${bg};border-color:rgba(0,0,0,.1);"`:''}><div class="chl">${l}</div><div class="chv"${tc?` style="color:${tc}"`:''}>${v}</div></div>`;}
+function renderAll(){
+  renderHeader();
+  if(tab==='contacted'){renderContactedView();}
+  else{renderTabs();renderList();renderDetail();}
+}
 
-function renderAll(){renderHeader();renderTabs();renderList();renderDetail();}
 function renderHeader(){
   const C=cnts();
-  document.getElementById('tab-counts').innerHTML=TABS.map(t=>`<div class="tc${tab===t.id?' on':''}" onclick="selTab('${t.id}')"><div class="tcn">${C[t.id]}</div><div class="tcl">${t.l}</div></div>`).join('');
-  document.getElementById('learn-badge').innerHTML=`<div class="lrn">📚 ${learned.length} learned${lastSync?' · '+lastSync:''}</div>`;
+  document.getElementById('htabs').innerHTML=TABS.map(t=>`<button class="htab${tab===t.id?' on':''}" onclick="selTab('${t.id}')"><div class="htab-n">${C[t.id]}</div><div class="htab-l">${t.l}</div></button>`).join('');
+  document.getElementById('lrn-badge').innerHTML=`<div class="lrn-badge">📚 ${learned.length} emails learned${lastSync?' · '+lastSync:''}</div>`;
 }
+
 function renderTabs(){
   const C=cnts();
-  document.getElementById('stabs').innerHTML=TABS.map(t=>`<button class="stab${tab===t.id?' on':''}" onclick="selTab('${t.id}')"><span class="stabn">${C[t.id]}</span><span>${t.i} ${t.l}</span></button>`).join('');
+  document.getElementById('stabs').innerHTML=TABS.filter(t=>t.id!=='contacted').map(t=>`<button class="stab${tab===t.id?' on':''}" onclick="selTab('${t.id}')"><span class="stab-n">${C[t.id]}</span><span>${t.i} ${t.l}</span></button>`).join('');
+  document.getElementById('side').style.display='';
 }
+
 function renderList(){
   const F=filt();
+  document.getElementById('srch').placeholder='Search '+F.length+' shops…';
   document.getElementById('slist').innerHTML=F.map(s=>{
-    const on=s.id===selId,c=s.status==='contacted'||s.status==='active';
+    const on=s.id===selId;
+    const c=s.status==='contacted'||s.status==='active';
+    const hasEmail=!!s.email;
     return`<div class="si${on?' on':''}" onclick="selShop('${s.id}')">
-      <div style="display:flex;align-items:center;gap:3px;margin-bottom:1px;">
-        ${c?`<span style="font-size:7px;font-weight:700;color:${on?'#5BA89E':'#1A7B4E'};">✓</span>`:''}
-        <span class="sin">${s.name}</span>
-        ${s.rev?`<span style="font-size:7px;font-weight:700;color:${on?'#E07A50':'#C17E2A'};margin-left:auto;">$${Math.round(s.rev/100)/10}K</span>`:''}
-        ${s.email&&!c?`<span style="font-size:7px;color:${on?'#5BA89E':'#2A8A8A'};margin-left:auto;">✉</span>`:''}
+      <div class="si-top">
+        ${c?`<span class="si-check">✓</span>`:''}
+        <span class="si-name">${s.name}</span>
+        ${hasEmail&&!c?`<span class="si-email-dot" title="Email on file"></span>`:''}
+        ${s.rev?`<span class="si-rev">$${Math.round(s.rev/1000*10)/10}K</span>`:''}
       </div>
-      <div class="sim">
+      <div class="si-meta">
         <span>${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}</span>
         ${s.contact?`<span>· ${s.contact.split(' ')[0]}</span>`:''}
-        ${s.sentDate?`<span style="margin-left:auto;font-size:6px;color:${on?'#5BA89E':'#1A7B4E'};">✓ sent</span>`:''}
+        ${s.sentDate?`<span class="si-sent" style="${on?'':''}">sent ${s.sentDate}</span>`:''}
       </div>
     </div>`;
   }).join('');
-  document.getElementById('srch').placeholder='Search '+F.length+' shops...';
 }
+
 function renderDetail(){
-  const sel=getSel(),det=document.getElementById('det');
-  if(!sel){det.innerHTML='<div style="display:flex;align-items:center;justify-content:center;flex:1;color:#9A8E82;font-size:12px;">Select a shop</div>';return;}
+  const det=document.getElementById('det');
+  const sel=getSel();
+  if(!sel){det.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9A8E82;font-size:14px;">Select a shop from the list</div>';return;}
   const isC=sel.status==='contacted'||sel.status==='active';
   const bdgBg=sel.status==='active'?'rgba(26,123,78,.9)':isC?'rgba(42,138,138,.9)':'rgba(224,122,80,.85)';
   const bdgTxt=sel.status==='active'?'Active':isC?'Contacted':'Not Contacted';
+
   let chips='';
-  if(sel.rev)chips+=chip('Revenue','$'+sel.rev.toLocaleString(),'rgba(224,122,80,.08)','#C17E2A');
-  if(sel.orders)chips+=chip('Orders',sel.orders);
-  if(sel.last)chips+=chip('Last Order',sel.last);
-  if(sel.days)chips+=chip('Days Since',sel.days+'d',sel.days>300?'rgba(178,74,44,.08)':'');
-  chips+=chip('Source',sel.source);
-  if(sel.sentDate)chips+=chip('Email Sent',sel.sentDate,'rgba(26,123,78,.08)','#1A7B4E');
+  if(sel.rev)chips+=`<div class="chip orange"><div class="chip-l">Revenue</div><div class="chip-v">$${sel.rev.toLocaleString()}</div></div>`;
+  if(sel.orders)chips+=`<div class="chip"><div class="chip-l">Orders</div><div class="chip-v">${sel.orders}</div></div>`;
+  if(sel.last)chips+=`<div class="chip"><div class="chip-l">Last Order</div><div class="chip-v">${sel.last}</div></div>`;
+  if(sel.days)chips+=`<div class="chip${sel.days>300?' red':''}"><div class="chip-l">Days Since</div><div class="chip-v">${sel.days}d</div></div>`;
+  chips+=`<div class="chip"><div class="chip-l">Source</div><div class="chip-v">${sel.source}</div></div>`;
+  if(sel.sentDate)chips+=`<div class="chip green"><div class="chip-l">Email Sent</div><div class="chip-v">${sel.sentDate}</div></div>`;
+
   let compInner='',dTog='';
   if(drafts){
-    dTog=`<div class="dtog">${['A','B'].map((l,i)=>`<button class="db${dIdx===i?' on':''}" onclick="setDI(${i})">Draft ${l}</button>`).join('')}</div>`;
+    dTog=`<div class="dtog">${['A','B'].map((l,i)=>`<button class="dtog-btn${dIdx===i?' on':''}" onclick="setDI(${i})">Draft ${l}</button>`).join('')}</div>`;
     const sb2=body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    compInner=`<div class="cbdy"><input value="${subj.replace(/"/g,'&quot;')}" oninput="subj=this.value" placeholder="Subject..."/><textarea rows="9" oninput="body=this.value">${sb2}</textarea></div>
-    <div class="cft">
-      ${sel.email?`<button class="svb" ${send||!body?'disabled':''} onclick="saveGmail()">${send?'Saving...':'→ Save to Gmail Drafts'}</button>`:`<span class="noe">⚠ No email on file</span>`}
-      <button class="mrb" onclick="markSent('${sel.id}',body);toast('Marked contacted!')">✓ Mark Contacted</button>
-      <span style="margin-left:auto;font-size:8px;color:#9A8E82;font-style:italic;">📚 ${learned.length} real emails learned</span>
+    compInner=`<div class="comp-body">
+      <input value="${subj.replace(/"/g,'&quot;')}" oninput="subj=this.value" placeholder="Subject…"/>
+      <textarea rows="10" oninput="body=this.value">${sb2}</textarea>
+    </div>
+    <div class="comp-footer">
+      ${sel.email?`<button class="save-btn" ${send||!body?'disabled':''} onclick="saveGmail()">${send?'Saving…':'→ Save to Gmail Drafts'}</button>`:`<span class="no-email">⚠ No email on file</span>`}
+      <button class="mark-btn" onclick="markSent('${sel.id}',body);toast('Marked as contacted!')">✓ Mark Contacted</button>
+      <span class="learned-note">📚 ${learned.length} real emails learned</span>
     </div>`;
   }else{
-    compInner=`<div class="emp"><div style="font-size:30px;color:#D4C5A9;margin-bottom:8px;">✉</div><div style="font-size:10px;line-height:1.6;color:#9A8E82;max-width:220px;margin:0 auto;">Click Generate Drafts for two personalized options in your voice.</div></div>`;
+    compInner=`<div class="comp-empty">
+      <div class="comp-empty-icon">✉</div>
+      <div class="comp-empty-txt">Click <strong>Generate Drafts</strong> for two personalized options written in your voice.</div>
+    </div>`;
   }
+
   const sn=sel.name.replace(/'/g,"\\'");
-  det.innerHTML=`<div class="ph"><img src="${gp(sel)}" onerror="this.style.display='none'" loading="lazy"/><div class="ov"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;"><div><div class="shn">${sel.name}</div><div class="shm">${sel.city}${sel.state?', '+sel.state:''}${sel.country?' · '+sel.country:''}${sel.contact?' · '+sel.contact:''}${sel.email?' · '+sel.email:''}${sel.web?` · <a href="https://${sel.web}" target="_blank" style="color:rgba(91,168,158,.8);text-decoration:none;">↗ ${sel.web}</a>`:''}</div></div><div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">${!isC?`<button class="mkb" onclick="openModal('${sel.id}','${sn}')">✓ Mark Sent</button>`:''}<span class="bdg" style="background:${bdgBg};">${bdgTxt}</span></div></div></div></div>
-  <div class="scr">
-    ${chips?`<div class="chips">${chips}</div>`:''}
-    ${sel.b?.length?`<div class="buls"><div class="bulh">About This Shop</div>${sel.b.map(x=>`<div style="font-size:10px;color:#3D3530;display:flex;gap:5px;line-height:1.4;margin-bottom:3px;"><span style="color:#E07A50;flex-shrink:0;">→</span><span>${x}</span></div>`).join('')}</div>`:''}
-    <div class="comp"><div class="comph"><span class="compt">Email Composer</span><div style="display:flex;gap:5px;align-items:center;">${dTog}<button class="gb" ${gen?'disabled':''} onclick="generate()">${gen?'Writing...':'✦ Generate Drafts'}</button></div></div>${err?`<div class="gerr">⚠ ${err}</div>`:''}${compInner}</div>
+  det.innerHTML=`
+    <div class="ph">
+      <img src="${gp(sel)}" onerror="this.style.display='none'" loading="lazy"/>
+      <div class="ph-overlay"></div>
+      <div class="ph-content">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div class="ph-name">${sel.name}</div>
+            <div class="ph-meta">
+              <span>${sel.city}${sel.state?', '+sel.state:''}${sel.country?' · '+sel.country:''}</span>
+              ${sel.contact?`<span>· ${sel.contact}</span>`:''}
+              ${sel.email?`<span>· ${sel.email}</span>`:''}
+              ${sel.web?`<span>· <a href="https://${sel.web}" target="_blank">↗ ${sel.web}</a></span>`:''}
+            </div>
+          </div>
+          <div class="ph-actions">
+            ${!isC?`<button class="mkb" onclick="openModal('${sel.id}','${sn}')">✓ Mark Sent</button>`:''}
+            <span class="bdg" style="background:${bdgBg};">${bdgTxt}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="scr">
+      ${chips?`<div class="chips">${chips}</div>`:''}
+      ${sel.b?.length?`<div class="about-card"><div class="about-h">About This Shop</div>${sel.b.map(x=>`<div class="about-item"><span class="about-arr">→</span><span>${x}</span></div>`).join('')}</div>`:''}
+      <div class="composer">
+        <div class="comp-hdr">
+          <span class="comp-title">Email Composer</span>
+          <div class="comp-btns">
+            ${dTog}
+            <button class="gen-btn" ${gen?'disabled':''} onclick="generate()">${gen?'Writing…':'✦ Generate Drafts'}</button>
+          </div>
+        </div>
+        ${err?`<div class="comp-err">⚠ ${err}</div>`:''}
+        ${compInner}
+      </div>
+    </div>`;
+}
+
+function renderContactedView(){
+  const side=document.getElementById('side');
+  side.style.display='none';
+  const det=document.getElementById('det');
+  const contacted=shops.filter(s=>s.status==='contacted').sort((a,b)=>new Date(b.sentDate||0)-new Date(a.sentDate||0));
+  det.style.gridColumn='1/-1';
+  if(contacted.length===0){
+    det.innerHTML=`<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-txt">No shops contacted yet.<br>Use the New Leads tab to generate and send emails.<br>Hit <strong>Sync Gmail</strong> to auto-import from your sent folder.</div></div>`;
+    return;
+  }
+  det.innerHTML=`<div class="contacted-wrap">
+    <div class="contacted-header">
+      <div class="contacted-title">Shops You've Reached Out To</div>
+      <div class="contacted-sub">${contacted.length} shops contacted · Hit "Sync Gmail" to auto-update from your sent folder</div>
+    </div>
+    <div class="contacted-list">
+      ${contacted.map(s=>`<div class="c-card">
+        <div class="c-check">✓</div>
+        <div class="c-info">
+          <div class="c-name">${s.name}</div>
+          <div class="c-meta">${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}${s.email?' · '+s.email:''}${s.source?' · '+s.source:''}</div>
+        </div>
+        ${s.sentDate?`<div class="c-date">${s.sentDate}</div>`:''}
+      </div>`).join('')}
+    </div>
   </div>`;
 }
+
+// Fix layout when switching back from contacted tab
+const origSelTab=selTab;
+function selTab(t){
+  document.getElementById('det').style.gridColumn='';
+  document.getElementById('side').style.display='';
+  tab=t;srchQ='';drafts=null;body='';err='';
+  const f=byTab(t)[0];if(f)selId=f.id;
+  save();
+  const si=document.getElementById('srch');if(si)si.value='';
+  renderAll();
+}
+
 renderAll();
 </script>
 </body>
