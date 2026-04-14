@@ -169,7 +169,7 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
 <body>
 <div id="root">
   <div id="hdr">
-    <span class="logo">ALIMO</span>
+    <span class="logo">ALIMO</span><span style="font-size:8px;color:#3A5A6A;margin-left:4px;font-weight:600;">v1.3</span>
     <div class="hd"></div>
     <span class="hsub">Wholesale Dashboard</span>
     <div id="htabs"></div>
@@ -359,10 +359,10 @@ function openModal(id,name){
 }
 
 function openSettings(){
-  document.getElementById('faire-token-input').value=faireToken;
-  document.getElementById('anthropic-key-input').value=anthropicKey;
   document.getElementById('settings').style.display='flex';
-  document.getElementById('faire-status').style.display='none';
+  const ft=document.getElementById('faire-token-input');if(ft)ft.value=faireToken;
+  const ak=document.getElementById('anthropic-key-input');if(ak)ak.value=anthropicKey;
+  const fs=document.getElementById('faire-status');if(fs)fs.style.display='none';
 }
 function closeSettings(){document.getElementById('settings').style.display='none';}
 function saveSettings(){faireToken=document.getElementById('faire-token-input').value.trim();anthropicKey=document.getElementById('anthropic-key-input').value.trim();save();closeSettings();toast('Settings saved!');}
