@@ -547,7 +547,7 @@ function updateGmailStatus(){
   const el=document.getElementById('gmail-status-line');
   if(!el)return;
   if(!googleClientId){el.innerHTML='<span style="color:#B24A2C;">⚠ Enter Google Client ID below, then connect.</span>';return;}
-  if(gmailConnected()){el.innerHTML='<span style="color:#1A7B4E;">✓ Gmail connected — hello@alimofun.com</span>';return;}
+  if(gmailConnected()){el.innerHTML='<span style="color:#1A7B4E;">✓ Gmail connected — sean@alimofun.com</span>';return;}
   el.innerHTML='<span style="color:#C17E2A;">⚠ Not connected. Click Connect Gmail below.</span>';
 }
 
@@ -589,7 +589,7 @@ async function ensureGmailToken(){
 }
 
 function makeEmailRaw(to,subject,body){
-  const from='hello@alimofun.com';
+  const from='sean@alimofun.com';
   const msg=['From: Alimo Studios <'+from+'>','To: '+to,'Subject: '+subject,'MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','',''+body].join('\r\n');
   return btoa(unescape(encodeURIComponent(msg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
@@ -619,7 +619,7 @@ async function syncGmail(){
   if(!ok){btn.disabled=false;btn.classList.remove('syncing');btn.textContent='⟳ Sync Gmail';return;}
   try{
     // Get sent message list
-    const q=encodeURIComponent('in:sent from:hello@alimofun.com');
+    const q=encodeURIComponent('in:sent from:sean@alimofun.com');
     const listRes=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?q='+q+'&maxResults=50',{
       headers:{'Authorization':'Bearer '+gmailToken}
     });
