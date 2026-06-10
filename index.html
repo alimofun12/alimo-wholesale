@@ -830,11 +830,11 @@ function renderDetail(){
           </div>
           ${showingDischargeFor===sel.id?`<div class="discharge-reasons">
             <p>Why discharging this lead?</p>
-            <button class="dr-btn" onclick="doDischarge('${sel.id}','Brand — sells own work only')">Brand, not retailer</button>
-            <button class="dr-btn" onclick="doDischarge('${sel.id}','Wrong fit — wrong market or aesthetic')">Wrong fit</button>
-            <button class="dr-btn" onclick="doDischarge('${sel.id}','Out of business')">Out of business</button>
-            <button class="dr-btn" onclick="doDischarge('${sel.id}','No response after outreach')">No response</button>
-            <button class="dr-btn" onclick="doDischarge('${sel.id}','Other')">Other</button>
+            <button class="dr-btn" onclick="discharge('Brand, not retailer')">Brand, not retailer</button>
+            <button class="dr-btn" onclick="discharge('Wrong fit')">Wrong fit</button>
+            <button class="dr-btn" onclick="discharge('Out of business')">Out of business</button>
+            <button class="dr-btn" onclick="discharge('No response')">No response</button>
+            <button class="dr-btn" onclick="discharge('Other')">Other</button>
             <button class="dr-btn" style="color:#999;border-color:#ddd" onclick="cancelDischarge()">Cancel</button>
           </div>`:''}
 
@@ -915,19 +915,19 @@ function showDischarge(id) {
 
 function doDischarge(id, reason) {
   shops = shops.map(s => s.id === id ? {...s, status:'discharged', dischargeReason: reason} : s);
-  // Learn from discharge
   const s = shops.find(x => x.id === id);
-  if (s) {
-    const learnNote = `DISCHARGED: ${s.name} (${s.city}) — Reason: ${reason}. Source: ${s.source||''}. Do not suggest similar shops: brands-only, wrong category, or closed.`;
-    learned = [...learned.filter(l => !l.startsWith('DISCHARGED: '+s.name)), learnNote].slice(-20);
+  if(s){
+    const note = 'DISCHARGED: '+s.name+' ('+s.city+') - Reason: '+reason+'. Source: '+(s.source||'')+'. Avoid similar shops.';
+    learned = [...learned.filter(l => l.indexOf('DISCHARGED: '+s.name)<0), note].slice(-20);
   }
   showingDischargeFor = null;
-  // Move to next shop
   const f = filt();
-  if (f.length) selId = f[0].id;
-  save();
-  renderAll();
-  toast(`Discharged. Pattern learned.`);
+  if(f.length) selId = f[0].id;
+  save(); renderAll();
+  toast('Discharged. Pattern learned.');
+}
+function discharge(reason){
+  if(showingDischargeFor) doDischarge(showingDischargeFor, reason);
 }
 
 function cancelDischarge() {
