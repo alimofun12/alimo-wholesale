@@ -180,6 +180,11 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
 .gate-err{font-size:12px;color:#E07A50;margin-top:10px;height:16px;}
 
 
+
+/* ── CHANNEL PICKER ──────────────────────────────────────────────── */
+.ch-btn{background:white;border:1px solid #D8D0C8;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:600;color:#7A6A5A;cursor:pointer;transition:all .12s;}
+.ch-btn:hover{border-color:#5BA89E;color:#5BA89E;}
+.ch-btn.on{background:#0D1B2A;border-color:#0D1B2A;color:white;}
 /* ── SOURCE FILTER PILLS ─────────────────────────────────────────── */
 .src-pill{background:none;border:1px solid #D8D0C8;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:#7A6A5A;cursor:pointer;transition:all .12s;letter-spacing:.02em;}
 .src-pill:hover{background:#EDE8E2;border-color:#B8A898;}
@@ -469,10 +474,10 @@ const TABS=[
 const N='#0D1B2A',KEY='alimo_v5';
 
 function loadSaved(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate||s.dischargeReason;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate,dischargeReason:s.dischargeReason||'',outreach:s.outreach||'email'})),learned,tab,selId,lastSync,faireToken,anthropicKey,googleClientId,gmailToken,gmailTokenExpiry}));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>{const d=BASE_SHOPS.find(x=>x.id===s.id);return s.status!==d?.status||s.sentDate!==d?.sentDate||s.dischargeReason;}).map(s=>({id:s.id,status:s.status,sentDate:s.sentDate,dischargeReason:s.dischargeReason||'',outreach:s.outreach||'email',contactNote:s.contactNote||'',contactChannel:s.contactChannel||''})),learned,tab,selId,lastSync,faireToken,anthropicKey,googleClientId,gmailToken,gmailTokenExpiry}));}catch(e){}}
 
 const sv=loadSaved();
-let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate,dischargeReason:o.dischargeReason||'',outreach:o.outreach||'email'}:{...d};});
+let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate,dischargeReason:o.dischargeReason||'',outreach:o.outreach||'email',contactNote:o.contactNote||'',contactChannel:o.contactChannel||''}:{...d};});
 let srcFilter=null,learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'',googleClientId=sv?.googleClientId||'',gmailToken=sv?.gmailToken||'',gmailTokenExpiry=sv?.gmailTokenExpiry||0;
 let drafts=null,dIdx=0,body='',subj='',gen=false,send=false,err='',srchQ='';
 
@@ -488,9 +493,11 @@ function selShop(id){selId=id;drafts=null;body='';dIdx=0;err='';save();renderDet
 function selTab(t){tab=t;srchQ='';drafts=null;body='';err='';const f=byTab(t)[0];if(f)selId=f.id;save();const si=document.getElementById('srch');if(si)si.value='';renderAll();}
 function setDI(i){dIdx=i;const d=i===0?drafts.a:drafts.b;if(d){body=d;subj=i===0?drafts.sa:drafts.sb;}renderDetail();}
 
-function markSent(id,b2){
+function markSent(id,b2,channel,note){
   const now=new Date().toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});
-  shops=shops.map(s=>s.id===id?{...s,status:'contacted',sentDate:now}:s);
+  const ch=channel||'email';
+  const outreach=ch==='ig'?'ig_dm':ch;
+  shops=shops.map(s=>s.id===id?{...s,status:'contacted',sentDate:now,outreach,contactNote:note||'',contactChannel:ch}:s);
   if(b2){learned=[...learned,b2].filter((v,i,a)=>a.indexOf(v)===i).slice(-10);}
   save();closeModal();renderAll();
 }
@@ -498,7 +505,46 @@ function markSent(id,b2){
 function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('modal').innerHTML='';}
 function openModal(id,name){
   const m=document.getElementById('modal');m.style.display='flex';
-  m.innerHTML=`<div class="modal-box"><div class="modal-title">Mark as Sent</div><div class="modal-sub">Confirm you sent an email to <strong>${name}</strong>?</div><div class="modal-btns"><button class="modal-yes" onclick="markSent('${id}',null)">Yes, mark sent</button><button class="modal-no" onclick="closeModal()">Cancel</button></div></div>`;
+  m.innerHTML=`<div class="modal-box" style="width:340px;">
+    <div class="modal-title">Mark as Contacted</div>
+    <div class="modal-sub">How did you reach out to <strong>${name}</strong>?</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="ch-btn on" id="ch-email" onclick="selCh('email')">✉ Email</button>
+      <button class="ch-btn" id="ch-faire" onclick="selCh('faire')">🏪 Faire</button>
+      <button class="ch-btn" id="ch-ig" onclick="selCh('ig')">📷 Instagram DM</button>
+      <button class="ch-btn" id="ch-phone" onclick="selCh('phone')">📞 Phone</button>
+      <button class="ch-btn" id="ch-person" onclick="selCh('person')">🤝 In Person</button>
+      <button class="ch-btn" id="ch-other" onclick="selCh('other')">💬 Other</button>
+    </div>
+    <textarea id="contact-note" placeholder="Optional note — e.g. 'Sent via Faire message, they seemed interested'" rows="3" style="width:100%;background:#F7F3EE;border:1px solid #E5DDD0;border-radius:7px;padding:9px 11px;font-size:12px;color:#1A1A1A;outline:none;resize:vertical;margin-bottom:14px;font-family:inherit;"></textarea>
+    <div class="modal-btns">
+      <button class="modal-yes" onclick="markSent('${id}',null,window._ch,'')">✓ Mark Contacted</button>
+      <button class="modal-no" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>`;
+  window._ch='email';
+  window._modalId='${id}';
+  // wire up confirm button after render
+  setTimeout(()=>{
+    const btn=document.querySelector('#modal .modal-yes');
+    if(btn)btn.onclick=()=>{
+      const note=document.getElementById('contact-note')?.value||'';
+      markSent(window._modalId,null,window._ch,note);
+    };
+  },0);
+}
+function selCh(ch){
+  window._ch=ch;
+  ['email','faire','ig','phone','person','other'].forEach(c=>{
+    const el=document.getElementById('ch-'+c);
+    if(el)el.classList.toggle('on',c===ch);
+  });
+  // update confirm button to use latest note
+  const btn=document.querySelector('#modal .modal-yes');
+  if(btn)btn.onclick=()=>{
+    const note=document.getElementById('contact-note')?.value||'';
+    markSent(window._ch==='ig'?window._modalId:window._modalId,null,window._ch,note);
+  };
 }
 
 function openSettings(){
@@ -801,7 +847,8 @@ function renderDetail(){
   if(!sel){det.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9A8E82;font-size:14px;">Select a shop from the list</div>';return;}
   const isC=sel.status==='contacted'||sel.status==='active';
   const bdgBg=sel.status==='active'?'rgba(26,123,78,.9)':isC?'rgba(42,138,138,.9)':'rgba(224,122,80,.85)';
-  const bdgTxt=sel.status==='active'?'Active':isC?(sel.outreach==='ig_dm'?'📱 IG DM':'Contacted'):'Not Contacted';
+  const chLabel=sel.contactChannel==='faire'?'🏪 Faire':sel.contactChannel==='phone'?'📞 Phone':sel.contactChannel==='person'?'🤝 In Person':sel.contactChannel==='other'?'💬 Other':sel.outreach==='ig_dm'?'📱 IG DM':'✉ Email';
+const bdgTxt=sel.status==='active'?'Active':isC?chLabel:'Not Contacted';
 
   let chips='';
   if(sel.rev)chips+=`<div class="chip orange"><div class="chip-l">Revenue</div><div class="chip-v">$${sel.rev.toLocaleString()}</div></div>`;
@@ -908,7 +955,8 @@ function renderContactedView(){
           <div class="c-name">${s.name}</div>
           <div class="c-meta">${s.city}${s.state?', '+s.state:''}${s.country?' · '+s.country:''}${s.email?' · '+s.email:''}${s.ig&&s.outreach==='ig_dm'?' · 📱 @'+s.ig:''}${s.source?' · '+s.source:''}</div>
         </div>
-        ${s.sentDate?`<div class="c-date">${s.sentDate}</div>`:''}
+        ${s.sentDate?`<div class="c-date">${s.outreach==='ig_dm'?'📱 ':s.contactChannel==='faire'?'🏪 ':s.contactChannel==='phone'?'📞 ':s.contactChannel==='person'?'🤝 ':''}${s.sentDate}</div>`:''}
+        ${s.contactNote?`<div style="font-size:11px;color:#9A8E82;margin-top:4px;font-style:italic;">"${s.contactNote}"</div>`:''}
       </div>`).join('')}
     </div>
   </div>`;
