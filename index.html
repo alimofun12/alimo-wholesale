@@ -179,6 +179,11 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
 .gate-btn:hover{background:#4A9A90;}
 .gate-err{font-size:12px;color:#E07A50;margin-top:10px;height:16px;}
 
+
+/* ── SOURCE FILTER PILLS ─────────────────────────────────────────── */
+.src-pill{background:none;border:1px solid #D8D0C8;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:#7A6A5A;cursor:pointer;transition:all .12s;letter-spacing:.02em;}
+.src-pill:hover{background:#EDE8E2;border-color:#B8A898;}
+.src-pill.active{background:#3A5A6A;border-color:#3A5A6A;color:white;}
 /* ── DISCHARGE ───────────────────────────────────────────────────── */
 .discharge-btn{background:none;border:1px solid #E0C4B8;border-radius:6px;padding:5px 10px;font-size:11px;color:#B06040;cursor:pointer;font-weight:600;transition:all .15s;}
 .discharge-btn:hover{background:#FAF0EA;border-color:#B06040;}
@@ -213,7 +218,7 @@ button,input,textarea,select{font-family:inherit;cursor:pointer;}
   <div id="body">
     <div id="side">
       <div class="stabs" id="stabs"></div>
-      <div class="srch"><input id="srch" placeholder="Search shops…" oninput="onSearch(this.value)"/></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;padding:5px 8px 4px;border-bottom:1px solid #E5DDD0;"><button class="src-pill active" onclick="setSrcFilter(null)" id="sf-all">All</button><button class="src-pill" onclick="setSrcFilter('Calendar Channel')" id="sf-cal">🗓 Calendar</button><button class="src-pill" onclick="setSrcFilter('Greenroom Artist Research')" id="sf-gr">🌿 Greenroom</button><button class="src-pill" onclick="setSrcFilter('Traveler-type research')" id="sf-tv">🏄 Traveler DNA</button></div><div class="srch"><input id="srch" placeholder="Search shops…" oninput="onSearch(this.value)"/></div>
       <div id="slist"></div>
     </div>
     <div id="det"></div>
@@ -393,6 +398,26 @@ const BASE_SHOPS=[
   {id:'tsf9',seg:'cold',name:'Pukas Surf Shop',city:'San Sebastian',state:'',country:'Spain',email:'sales@pukassurfshop.com',contact:'',web:'pukassurfshop.com',status:'not_contacted',source:'Traveler-type research',b:['Iconic Basque surf shop and brand, art + lifestyle culture','Hossegor and San Sebastian surf hub, European indie art buyers','Strong track record buying indie surf art and lifestyle goods','Already have Helder Supply in Biarritz — Pukas is the Spanish peer']},
   {id:'tsf10',seg:'cold',name:'Pilgrim Surf Supply Tokyo',city:'Tokyo',state:'',country:'Japan',email:'',contact:'',web:'pilgrimsurfsupply.com',status:'not_contacted',source:'Traveler-type research',b:['Tokyo location of Brooklyn-founded Pilgrim Surf — same curatorial DNA','Carries indie art, books, lifestyle goods and surf hardware','Japanese market with strong indie art collector culture','Pilgrim Surf already contacted in Brooklyn — Tokyo is a separate buyer']},
 
+
+  // ── CALENDAR CHANNEL ────────────────────────────────────────────────
+  // 2027 Desk Calendar pre-orders. Bookstores, museum shops, stationery.
+  // Ships mid-October = perfect holiday gift season inventory.
+  // BOOKSTORES
+  {id:'cal1',seg:'cold',name:"Powell's Books",city:'Portland',state:'OR',email:'submissions@powells.com',contact:'Buying Dept',web:'powells.com',status:'not_contacted',source:'Calendar Channel',b:['Oregon iconic indie bookstore - you are Oregon-native, lead with this','Actively buys local indie artist calendars for Q4 gift season','5 Portland locations plus massive online reach']},
+  {id:'cal2',seg:'cold',name:'McNally Jackson Goods for the Study',city:'New York',state:'NY',email:'buyer@mcnallyjackson.com',contact:'Buyer',web:'mcnallyjacksonstore.com',status:'not_contacted',source:'Calendar Channel',b:['Standalone stationery and design goods shop in Nolita NYC','Specifically carries calendars and paper goods, multiple NYC locations','You are Brooklyn-based, strong local angle']},
+  {id:'cal3',seg:'cold',name:'Greenlight Bookstore',city:'Brooklyn',state:'NY',email:'info@greenlightbookstore.com',contact:'',web:'greenlightbookstore.com',status:'not_contacted',source:'Calendar Channel',b:['Brooklyn indie bookstore, Fort Greene and Prospect Lefferts Gardens','Actively champions Brooklyn-made goods and local artists','You live in Brooklyn, strongest possible local connection']},
+  {id:'cal4',seg:'cold',name:'Strand Bookstore',city:'New York',state:'NY',email:'wholesale@strandbooks.com',contact:'Wholesale Dept',web:'strandbooks.com',status:'not_contacted',source:'Calendar Channel',b:['NYC landmark, massive gift and stationery section','Active wholesale program with indie artists and designers','LaGuardia Airport satellite = high impulse buy foot traffic']},
+  {id:'cal5',seg:'cold',name:'Book Soup',city:'West Hollywood',state:'CA',email:'info@booksoup.com',contact:'',web:'booksoup.com',status:'not_contacted',source:'Calendar Channel',b:['Legendary LA indie bookstore on Sunset Strip','Strong art, design, and photography section','High-traffic LA location, creative and celebrity clientele']},
+  {id:'cal6',seg:'cold',name:'Warwicks',city:'La Jolla',state:'CA',email:'info@warwicks.com',contact:'',web:'warwicks.com',status:'not_contacted',source:'Calendar Channel',b:["Oldest continuously family-run bookstore in America since 1896",'La Jolla coastal community, surf-adjacent calendar art is natural fit','Active gift and stationery section, strong Q4 calendar buyer']},
+  {id:'cal7',seg:'cold',name:'Folio Press and Paperie',city:'Portland',state:'OR',email:'',contact:'',web:'foliopresspdx.com',status:'not_contacted',source:'Calendar Channel',b:['Portland letterpress and paper goods shop','Natural home for art desk calendars, this is their exact product type','Oregon connection ties to your Portland roots']},
+  // MUSEUM SHOPS
+  {id:'cal8',seg:'cold',name:'Brooklyn Museum Shop',city:'Brooklyn',state:'NY',email:'shop@brooklynmuseum.org',contact:'Shop Buyer',web:'shop.brooklynmuseum.org',status:'not_contacted',source:'Calendar Channel',b:['Actively does wholesale, specifically prioritizes Brooklyn-designed products','You are Brooklyn-based, this is a direct local artist fit','Museum shops are the top volume calendar buyers every Q4']},
+  {id:'cal9',seg:'cold',name:'SFMOMA Museum Store',city:'San Francisco',state:'CA',email:'museumstore@sfmoma.org',contact:'Store Buyer',web:'museumstore.sfmoma.org',status:'not_contacted',source:'Calendar Channel',b:['West Coast top modern art museum store, carries calendars puzzles and design goods','Strong aesthetic overlap with Alimo post-pop bold color work','High foot traffic, tourist plus local art buyer clientele']},
+  {id:'cal10',seg:'cold',name:'Bishop Museum Shop',city:'Honolulu',state:'HI',email:'',contact:'',web:'bishopmuseum.org',status:'not_contacted',source:'Calendar Channel',b:['Hawaii largest natural and cultural history museum','Shop stocks Hawaii-themed and ocean-inspired gifts and art','Your Greenroom Gallery connection gives strong Hawaii credibility']},
+  {id:'cal11',seg:'cold',name:'California Academy of Sciences Store',city:'San Francisco',state:'CA',email:'',contact:'',web:'calacademy.org',status:'not_contacted',source:'Calendar Channel',b:['Nature and science museum in Golden Gate Park SF','Gift shop carries eco-themed art, gifts, and calendars','Your FSC-certified eco-friendly packaging is a strong sell here']},
+  // STATIONERY AND GIFTS
+  {id:'cal12',seg:'cold',name:'powerHouse Arena',city:'Brooklyn',state:'NY',email:'info@powerhousearena.com',contact:'',web:'powerhousearena.com',status:'not_contacted',source:'Calendar Channel',b:['Brooklyn DUMBO bookstore, gallery, and event space','Stocks design books, art goods, and indie artist products','You are Brooklyn-based, hyper-local connection, great fit']},
+
   // ── FAIRE ACCOUNTS ───────────────────────────────────────────────────
   {id:'f0',seg:'warm',name:'Traveler Surf Club',city:'Pacifica',state:'CA',email:'lauren@travelersurfclub.com',contact:'Lauren Diaz',rev:19130,orders:41,last:'Oct 13, 2025',days:145,source:'Faire',status:'not_contacted',b:[]},
   {id:'f1',seg:'warm',name:'General Store Paso Robles',city:'Paso Robles',state:'CA',email:'',contact:'Joeli Yaguda',rev:6001,orders:10,last:'Oct 05, 2025',days:153,source:'Faire',status:'not_contacted',b:[]},
@@ -448,10 +473,10 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify({ov:shops.filter(s=>
 
 const sv=loadSaved();
 let shops=BASE_SHOPS.map(d=>{const o=sv?.ov?.find(x=>x.id===d.id);return o?{...d,status:o.status,sentDate:o.sentDate,dischargeReason:o.dischargeReason||'',outreach:o.outreach||'email'}:{...d};});
-let learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'',googleClientId=sv?.googleClientId||'',gmailToken=sv?.gmailToken||'',gmailTokenExpiry=sv?.gmailTokenExpiry||0;
+let srcFilter=null,learned=sv?.learned||[P1,P2],tab=sv?.tab||'cold',selId=sv?.selId||'c1',lastSync=sv?.lastSync||null,faireToken=sv?.faireToken||'',anthropicKey=sv?.anthropicKey||'',googleClientId=sv?.googleClientId||'',gmailToken=sv?.gmailToken||'',gmailTokenExpiry=sv?.gmailTokenExpiry||0;
 let drafts=null,dIdx=0,body='',subj='',gen=false,send=false,err='',srchQ='';
 
-const byTab=t=>t==='contacted'?shops.filter(s=>s.status==='contacted'||s.status==='active'):shops.filter(s=>s.seg===t&&s.status!=='discharged');
+const byTab=t=>t==='contacted'?shops.filter(s=>s.status==='contacted'||s.status==='active'):shops.filter(s=>s.seg===t&&s.status!=='discharged'&&(!srcFilter||s.source===srcFilter));
 const getSel=()=>shops.find(s=>s.id===selId);
 const cnts=()=>{const o={};TABS.forEach(t=>o[t.id]=byTab(t.id).length);return o;};
 const filt=()=>{if(tab==='contacted')return byTab('contacted');const q=srchQ.toLowerCase();return byTab(tab).filter(s=>[s.name,s.city,s.contact||'',s.state||'',s.country||''].some(x=>x.toLowerCase().includes(q)));};
@@ -908,6 +933,14 @@ function markIgDm(id){
 // ── DISCHARGE ─────────────────────────────────────────────────────────
 let showingDischargeFor = null;
 
+
+function setSrcFilter(src){
+  srcFilter=src;
+  document.querySelectorAll('.src-pill').forEach(p=>p.classList.remove('active'));
+  const id=src===null?'sf-all':src==='Calendar Channel'?'sf-cal':src==='Greenroom Artist Research'?'sf-gr':'sf-tv';
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  renderList();
+}
 function showDischarge(id) {
   showingDischargeFor = id;
   renderDetail();
